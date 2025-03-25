@@ -1,0 +1,4 @@
+fire>=0.5.0
+jsonpath-ng>=1.6.1
+simple-websocket>=0.10.1
+simplejson>=3.19.1
