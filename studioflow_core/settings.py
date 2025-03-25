@@ -1,0 +1,52 @@
+import os
+import pathlib
+import sys
+import typing
+
+from studioflow_core.environment import DEFAULT_PORT
+from studioflow_core.utils import get_free_port
+
+
+class SettingsController(object):
+    _instance: typing.Optional["SettingsController"] = None
+    _root_path: typing.Optional[pathlib.Path] = None
+    _server_port: typing.Optional[int] = None
+
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super(SettingsController, cls).__new__(cls)
+        return cls._instance
+
+    @staticmethod
+    def set_root_path(root_path_str: str):
+        root_path = pathlib.Path(root_path_str).absolute()
+        root_path.mkdir(exist_ok=True, parents=True)
+        os.chdir(root_path)
+
+        if root_path not in sys.path:
+            sys.path.append(str(root_path))
+        
+        SettingsController._root_path = root_path
+
+    @staticmethod
+    def set_server_port(server_port: typing.Union[int, str, None], force=False):
+        port = 3000
+        if isinstance(server_port, int):
+            port = server_port
+        elif isinstance(server_port, str):
+            port = int(server_port)
+        elif DEFAULT_PORT:
+            port = int(DEFAULT_PORT)
+
+        if not force:
+            port = get_free_port(port)
+        
+        SettingsController._server_port = port
+
+    @property
+    def server_port(self) -> int:
+        if SettingsController._server_port is None:
+            raise Exception("You must set the sever before using it")
+        return SettingsController._server_port
+    
+Settings = SettingsController()
