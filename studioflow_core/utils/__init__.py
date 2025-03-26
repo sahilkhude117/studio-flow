@@ -4,13 +4,33 @@ import re
 import socket
 import sys
 import typing as t 
-
 from contextlib import closing
 from uuid import uuid4
+
 import jsonpath_ng as jp
 import simplejson
 
+
+def hash_string(value):
+    import hashlib
+
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(value.encode("utf-8"))
+    hashed_string = sha256_hash.hexdigest()
+
+    return hashed_string
+
+
+def get_local_user_id():
+    import uuid
+
+    id = str(uuid.getnode())
+
+    return hash_string(id)
+
+
 def get_free_port(default_port: int) -> int:
+
     range_start = default_port
     range_end = default_port + 100
 
@@ -23,3 +43,7 @@ def get_free_port(default_port: int) -> int:
     raise Exception(
         f"Could not find a free port in the range {range_start}-{range_end}"
     )
+
+
+def get_local_python_version():
+    return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
