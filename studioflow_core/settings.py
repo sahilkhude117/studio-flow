@@ -44,6 +44,12 @@ class SettingsController(object):
         SettingsController._server_port = port
 
     @property
+    def root_path(self) -> pathlib.Path:
+        if SettingsController._root_path is None:
+            raise Exception("You must set the root path before using it")
+        return SettingsController._root_path
+
+    @property
     def server_port(self) -> int:
         if SettingsController._server_port is None:
             raise Exception("You must set the sever before using it")
