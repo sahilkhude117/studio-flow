@@ -11,7 +11,7 @@ from studioflow_core.utils.serializable import Serializable
 from studioflow_core.repositories.multiprocessing import MPContext
 from studioflow_core.utils.dot_studioflow import TASKS_FOLDER
 from studioflow_core.utils.datetime import to_utc_iso_string
-from studioflow_core.repositories.file_manager import FileManager
+from studioflow_core.utils.file_manager import FileManager
 
 TaskStatus = Literal["pending", "locked", "completed"]
 TaskPayload = Dict[str, Union[str, object, Dict[str, object], List, Dict]]
