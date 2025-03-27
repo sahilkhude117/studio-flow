@@ -11,8 +11,14 @@ LOGFORMAT = lambda: os.getenv("ABSTRA_LOGFORMAT", DEFAULT_LOGFORMAT)
 HOST = os.getenv("STUDIOFLOW_HOST", "localhost")
 DEFAULT_PORT = os.getenv("PORT") or os.getenv("STUDIOFLOW_SERVER_PORT")
 
+BUILD_ID = os.getenv("STUDIOFLOW_BUILD_ID") or "dev"
+PROJECT_ID = os.getenv("STUDIOFLOW_PROJECT_ID") or "dev-project-id"
+PROJECT_URL = os.getenv("STUDIOFLOW_PROJECT_URL")
+
 CLOUD_API_ENDPOINT = os.getenv("CLOUD_API_ENDPOINT") or "https://cloud-api.abstra.cloud"
 CLOUD_API_CLI_URL = f"{CLOUD_API_ENDPOINT}/cli"
+
+PUBLIC_KEY = os.getenv("ABSTRA_JWT_PUBLIC_KEY_PEM")
 
 SIDECAR_SHARED_TOKEN = os.getenv("STUDIOFLOW_SIDECAR_SHARED_TOKEN", "shared")
 SIDECAR_HEADERS = {"shared-token": SIDECAR_SHARED_TOKEN}
