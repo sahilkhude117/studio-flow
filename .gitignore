@@ -1,0 +1,18 @@
+.env
+
+/studioflow/__pycache__
+/studioflow_core/__pycache__
+/studioflow_core/controllers/__pycache__
+
+# Server
+/studioflow_core/server/__pycache__
+/studioflow_core/controllers/__pycache__
+/studioflow_core/repositories/__pycache__
+/studioflow_core/repositories/project/__pycache__
+/studioflow_core/repositories/json_migrations/__pycache__
+/studioflow_core/server/apps/__pycache__
+/studioflow_core/server/routes/__pycache__
+/studioflow_core/server/blueprints/__pycache__
+/studioflow_core/interface/cli/__pycache__
+/studioflow_core/utils/__pycache__
+/studioflow_statics/__pycache__
