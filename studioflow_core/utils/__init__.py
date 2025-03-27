@@ -31,6 +31,9 @@ def get_local_user_id():
 
     return hash_string(id)
 
+def serialize(obj, **kwargs):
+    return simplejson.dumps(obj, ignore_nan=True, **kwargs)
+
 
 def get_free_port(default_port: int) -> int:
 
