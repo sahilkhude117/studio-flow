@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Studioflow debugger",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+              "host": "localhost",
+              "port": "${input:studioflowDebugPort}"
+            }
+          }
+    ],
+    "inputs": [
+      {
+        "id": "studioflowDebugPort",
+        "description": "Debug given by abstra server",
+        "type": "promptString"
+      }
+    ]
+}
