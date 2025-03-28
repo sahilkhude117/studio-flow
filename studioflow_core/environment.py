@@ -15,6 +15,7 @@ BUILD_ID = os.getenv("STUDIOFLOW_BUILD_ID") or "dev"
 PROJECT_ID = os.getenv("STUDIOFLOW_PROJECT_ID") or "dev-project-id"
 PROJECT_URL = os.getenv("STUDIOFLOW_PROJECT_URL")
 
+IS_PRODUCTION = os.getenv("STUDIOFLOW_ENVIRONMENT") == "production"
 CLOUD_API_ENDPOINT = os.getenv("CLOUD_API_ENDPOINT") or "https://cloud-api.abstra.cloud"
 CLOUD_API_CLI_URL = f"{CLOUD_API_ENDPOINT}/cli"
 
