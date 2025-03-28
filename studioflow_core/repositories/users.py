@@ -46,7 +46,7 @@ class TestUsersRepository(UsersRepository):
         return True
 
 
-class LocalUserRepository(UsersRepository):
+class LocalUsersRepository(UsersRepository):
     @property
     def heades(self):
         return resolve_headers()
