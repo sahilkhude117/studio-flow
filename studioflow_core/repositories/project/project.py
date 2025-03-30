@@ -1411,7 +1411,7 @@ class Project:
         try:
             return Project.__from_dict(data)
         except Exception as e:
-            print("Error: incompatible abstra.json file.")
+            print("Error: incompatible studioflow.json file.")
             StudioFlowLogger.capture_exception(e)
             sys.exit(1)
 
@@ -1468,6 +1468,7 @@ class ProjectRepository:
         if not favicon_path.exists():
             favicon_path.write_bytes(studioflow_favicon)
 
+    @classmethod
     def exists(cls):
         return cls.get_file_path().exists()
     
