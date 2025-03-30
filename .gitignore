@@ -1,18 +1,55 @@
 .env
 
+# studio-flow
 /studioflow/__pycache__
+
+# Core
 /studioflow_core/__pycache__
+
+# Cloud Api
+/studioflow_core/cloud_api/__pycache__
+
+# Controllers
 /studioflow_core/controllers/__pycache__
 
-# Server
-/studioflow_core/server/__pycache__
-/studioflow_core/controllers/__pycache__
+# Entities
+/studioflow_core/entities/__pycache__
+
+# Interface 
+#  - cli
+/studioflow_core/interface/cli/__pycache__ 
+
+# linter
+/studioflow_core/linter/__pycache__ 
+/studioflow_core/linter/rules/__pycache__ 
+
+# repositories
 /studioflow_core/repositories/__pycache__
 /studioflow_core/repositories/project/__pycache__
-/studioflow_core/repositories/json_migrations/__pycache__
+/studioflow_core/repositories/project/json_migrations/__pycache__
+/studioflow_core/repositories/services/__pycache__
+
+# server
+/studioflow_core/server/__pycache__
 /studioflow_core/server/apps/__pycache__
 /studioflow_core/server/routes/__pycache__
 /studioflow_core/server/blueprints/__pycache__
-/studioflow_core/interface/cli/__pycache__
+
+# services
+/studioflow_core/services/__pycache__
+
+# templates
+/studioflow_core/templates/__pycache__
+
+# utils
 /studioflow_core/utils/__pycache__
+
+
+
+# Statics
 /studioflow_statics/__pycache__
+
+
+studioflow.egg-info
+
+folder
