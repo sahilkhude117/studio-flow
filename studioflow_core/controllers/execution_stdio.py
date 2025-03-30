@@ -5,6 +5,13 @@ import flask_sock
 
 from studioflow_core.controllers.main import MainController
 from studioflow_core.utils import serialize
+from studioflow_core.logger import StudioFlowLogger
+from studioflow_core.environment import IS_PRODUCTION
+from studioflow_core.env_masker import GLOBAL_MASKER
+from studioflow_core.controllers.sdk_context import (
+    ExecutionNotFound,
+    SDKContextStore
+)
 
 class StdioController:
     listeners: List[flask_sock.Server] = []
@@ -34,3 +41,53 @@ class StdioController:
                 listener.send(msg)
             except Exception:
                 pass
+
+    def __init__(
+        self,
+        *,
+        main_controller: MainController,
+        sys_stdout_write,
+        sys_stderr_write,
+    ):
+        self.execution_logs_repository = main_controller.execution_logs_repository
+        self.execution_repository = main_controller.execution_repository
+        self.sys_stdout_write = sys_stdout_write
+        self.sys_stderr_write = sys_stderr_write
+
+    def patched_stderr_write(self, raw: Union[str, bytearray]) -> int:
+        return self._wrapper("stderr", self.sys_stderr_write, raw)
+
+    def patched_stdout_write(self, raw: Union[str, bytearray]) -> int:
+        return self._wrapper("stdout", self.sys_stdout_write, raw)
+
+    def _wrapper(
+        self,
+        type: Literal["stdout", "stderr"],
+        sys_write: Callable,
+        raw: Union[str, bytearray],
+    ):
+        text = raw.decode("utf-8") if not isinstance(raw, str) else raw
+
+        if IS_PRODUCTION:
+            text = GLOBAL_MASKER.mask(text)
+
+        try:
+            short_id = self._capture_stdio(type, text).split(sep="-")[0]
+            term_output = f"[RUN {short_id}] {text}" if text.strip() else text
+            sys_write(term_output)
+        except ExecutionNotFound:
+            sys_write(text)
+        except Exception as e:
+            StudioFlowLogger.capture_exception(e)
+        finally:
+            sys.stdout.flush()
+            return len(text)
+
+    def _capture_stdio(self, type: Literal["stderr", "stdout"], text: str) -> str:
+        execution = SDKContextStore.get_execution()
+        self.execution_logs_repository.insert_stdio(execution.id, type, text)
+        self.broadcast(
+            type=type, log=text, execution_id=execution.id, stage_id=execution.stage_id
+        )
+
+        return execution.id
