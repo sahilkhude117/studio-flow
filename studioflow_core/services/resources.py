@@ -28,6 +28,7 @@ class ResourcesRepository:
     @staticmethod
     def get_file():
         file = Settings.root_path / RESOURCES_FILE
+        file.parent.mkdir(parents=True, exist_ok=True)
         file.touch(exist_ok=True)
         return file
 
