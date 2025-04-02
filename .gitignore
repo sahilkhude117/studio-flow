@@ -1,68 +1,24 @@
-.env
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# studio-flow
-/studioflow/__pycache__
+node_modules
+dist
+dist-ssr
+*.local
 
-## Core
-/studioflow_core/__pycache__
-
-# Cloud Api
-/studioflow_core/cloud_api/__pycache__
-
-# Controllers
-/studioflow_core/controllers/__pycache__
-/studioflow_core/controllers/common/__pycache__
-/studioflow_core/controllers/service/__pycache__
-
-# Email Templates
-/studioflow_core/email_templates/__pycache__
-
-# Entities
-/studioflow_core/entities/__pycache__
-/studioflow_core/entities/forms/__pycache__
-/studioflow_core/entities/forms/widgets/__pycache__
-
-# Interface 
-/studioflow_core/interface/__pycache__ 
-/studioflow_core/interface/cli/__pycache__ 
-/studioflow_core/interface/contract/__pycache__ 
-/studioflow_core/interface/sdk/__pycache__ 
-
-# linter
-/studioflow_core/linter/__pycache__ 
-/studioflow_core/linter/rules/__pycache__ 
-
-# repositories
-/studioflow_core/repositories/__pycache__
-/studioflow_core/repositories/project/__pycache__
-/studioflow_core/repositories/project/json_migrations/__pycache__
-/studioflow_core/repositories/project/json_migrations/tasks/__pycache__
-/studioflow_core/repositories/services/__pycache__
-/studioflow_core/repositories/services/roles/__pycache__
-
-# server
-/studioflow_core/server/__pycache__
-/studioflow_core/server/apps/__pycache__
-/studioflow_core/server/routes/__pycache__
-/studioflow_core/server/blueprints/__pycache__
-
-# services
-/studioflow_core/services/__pycache__
-
-# templates
-/studioflow_core/templates/__pycache__
-
-# utils
-/studioflow_core/utils/__pycache__
-
-# widgets
-/studioflow_core/widgets/__pycache__
-
-
-# Statics
-/studioflow_statics/__pycache__
-
-
-studioflow.egg-info
-
-folder
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
