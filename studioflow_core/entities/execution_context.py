@@ -7,6 +7,7 @@ from studioflow_core.repositories.tasks import TaskDTO
 from studioflow_core.utils.dict import filter_non_string_values
 from studioflow_core.utils.serializable import Serializable
 
+
 class Request(Serializable):
     query_params: Dict[str, str]
     headers: Dict[str, str]
@@ -19,20 +20,26 @@ class Response(Serializable):
     status: int
     body: str
 
+
 class ExecutionMock(Serializable):
     test_pending_tasks: List[TaskDTO] = Field(default_factory=list)
+
 
 class HookExecutionMock(ExecutionMock):
     test_request: Optional[Request] = None
 
+
 class FormExecutionMock(ExecutionMock):
     test_answers: List[Union[str, None]] = Field(default_factory=list)
+
 
 class ScriptExecutionMock(ExecutionMock):
     test_trigger_task: Optional[TaskDTO] = None
 
+
 class JobExecutionMock(ExecutionMock):
     pass
+
 
 class HookContext(Serializable):
     request: Request
@@ -63,6 +70,7 @@ class JobContext(Serializable):
 
 
 ClientContext = Union[HookContext, FormContext, ScriptContext, JobContext]
+
 
 def extract_flask_request(request: flask.Request) -> Request:
     return Request(

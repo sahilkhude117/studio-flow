@@ -10,6 +10,7 @@ import studioflow_statics
 
 dist_folder = Path(inspect.getfile(studioflow_statics)).joinpath("../dist").resolve()
 
+
 def send_from_dist(
     filename: str,
     fallback: typing.Optional[str] = None,
@@ -19,10 +20,9 @@ def send_from_dist(
     mimetypes.add_type("text/css", ".css")
     mimetypes.add_type("text/html", ".html")
 
-    try: 
+    try:
         return flask.send_from_directory(dist_folder, filename)
     except wz_ex.NotFound:
         if fallback is None:
             return flask.Response(status=404)
         return flask.send_from_directory(dist_folder, fallback)
-

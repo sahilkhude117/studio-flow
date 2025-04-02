@@ -9,6 +9,7 @@ from studioflow_core.utils.serializable import Serializable
 
 T = TypeVar("T", bound=Serializable)
 
+
 class FileManager(Generic[T]):
     def __init__(self, mp_context: MPContext, directory: str, model: Type[T]):
         self.lock = mp_context.RLock()
@@ -66,19 +67,3 @@ class FileManager(Generic[T]):
                     self.delete(id)
 
         return None
-
-    def __init__(self, mp_context: MPContext, directory: str, model: Type[T]):
-        self.lock = mp_context.RLock()
-        self.directory = directory
-        self.model = model
-
-    @property
-    def directory_path(self) -> Path:
-        return Settings.root_path / self.directory
-
-    def save(self, id:str, data: T) -> None:
-        with self.lock:
-            file_path = self._get_file_path(id)
-
-            with file_path.open('w', encoding='utf-8') as f:
-                f.write(data.dump_json())

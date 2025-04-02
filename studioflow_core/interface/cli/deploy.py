@@ -11,6 +11,7 @@ from studioflow_core.logger import StudioFlowLogger
 from studioflow_core.settings import Settings
 from studioflow_core.utils.file import files_from_directory
 
+
 def _generate_zip_file() -> pathlib.Path:
     root_path = Settings.root_path
     zip_path = pathlib.Path(tempfile.gettempdir(), f"{uuid.uuid4()}.zip")
@@ -25,6 +26,7 @@ def _generate_zip_file() -> pathlib.Path:
 def _upload_file(url: str, file_path: pathlib.Path):
     with file_path.open("rb") as f:
         requests.put(url=url, data=f.read())
+
 
 def deploy():
     headers = resolve_headers()

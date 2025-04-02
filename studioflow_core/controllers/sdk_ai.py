@@ -31,7 +31,7 @@ class AiSDKController:
                 "required": variable_names,
             },
         }
-    
+
     def _extract_pdf_images(self, file: Prompt) -> List[io.BytesIO]:
         images = []
         for page in pdfium.PdfDocument(file):

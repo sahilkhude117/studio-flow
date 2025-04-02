@@ -1,18 +1,20 @@
 from typing import List, Optional, TypedDict
 
-from studioflow_core.entities.forms.form_state import State
+from studioflow_core.entities.forms.form_state import (
+    State,
+)
 from studioflow_core.entities.forms.steps import (
     ComputationStep,
     EndPageStep,
     GeneratorStep,
     PageStep,
-    Step
+    Step,
 )
 from studioflow_core.entities.forms.template import (
     BackButton,
     Button,
     NextButton,
-    TemplateRenderer
+    TemplateRenderer,
 )
 
 BACK_ACTION_LABEL = BackButton().label

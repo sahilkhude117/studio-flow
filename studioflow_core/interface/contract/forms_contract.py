@@ -2,8 +2,8 @@ import inspect
 from dataclasses import dataclass
 from typing import Dict, List, Literal, Optional, TypedDict, Union
 
-from studioflow_core.entities.forms.form_entity import StepsInfo
 from studioflow_core.debug import make_exception_debug_data, make_frame_debug_data
+from studioflow_core.entities.forms.form_entity import StepsInfo
 
 
 class Message:
@@ -29,7 +29,7 @@ class ValidationResult(TypedDict):
     status: bool
     message: str
 
-    
+
 ### ExecutionMessages
 
 PythonExecutionMessageType = Literal["execution:started", "execution:ended"]
@@ -149,6 +149,7 @@ PythonAuthMessageType = Literal[
     "auth:valid-jwt",
 ]
 
+
 class AuthRequireInfoMessage(Message):
     type = "auth:require-info"
 
@@ -190,8 +191,6 @@ class RedirectRequestMessage(Message):
 
     def __init__(self, url: str, query_params: dict):
         super().__init__({"url": url, "queryParams": query_params}, True)
-
-
 
 
 ### Unions Types

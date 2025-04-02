@@ -16,6 +16,7 @@ from studioflow_core.utils.serializable import Serializable
 T = TypeVar("T", bound=ClientContext)
 ExecutionStatus = Literal["running", "failed", "finished", "abandoned"]
 
+
 class Execution(Serializable, Generic[T]):
     id: str
     stage_id: str

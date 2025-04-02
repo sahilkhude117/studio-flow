@@ -5,8 +5,10 @@ import flask_cors
 
 from studioflow_core.controllers.main import MainController
 from studioflow_core.server.blueprints.editor import get_editor_bp
+from studioflow_core.server.blueprints.player import get_player_bp
 
-def get_local_app(controller: MainController ) -> flask.Flask:
+
+def get_local_app(controller: MainController) -> flask.Flask:
     app = flask.Flask(__name__)
     app.config["SOCK_SERVER_OPTIONS"] = {"subprotocols": ["default"]}
     app.url_map.strict_slashes = False
@@ -14,6 +16,9 @@ def get_local_app(controller: MainController ) -> flask.Flask:
 
     editor = get_editor_bp(controller)
     app.register_blueprint(editor, url_prefix="/_editor")
+
+    player = get_player_bp(controller)
+    app.register_blueprint(player)
 
     @app.before_request
     def rename_thread():

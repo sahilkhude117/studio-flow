@@ -284,12 +284,15 @@ FILE_TYPES = {
     },
 }
 
+
 GIT_FOLDER = ".git"
-STUDIOFLOW_IGNORE = ".studioflowignore"
-STUDIOFLOW_TABLES_FILE = "studioflow-tables.json"
+ABSTRA_IGNORE = ".abstraignore"
+ABSTRA_TABLES_FILE = "abstra-tables.json"
+
 
 def is_relative_path(path: str) -> bool:
     return not path.startswith("<") and not path.startswith("/")
+
 
 def make_ignore_regex(path: str) -> re.Pattern:
     posix_path = path.replace("\\", "/")
@@ -301,12 +304,13 @@ def make_ignore_regex(path: str) -> re.Pattern:
 
     return re.compile(ignore_regex)
 
+
 def get_ignore_files(dir: Path):
     GITIGNORE = dir.joinpath(".gitignore")
-    IGNOREFILE = dir.joinpath(STUDIOFLOW_IGNORE)
+    IGNOREFILE = dir.joinpath(ABSTRA_IGNORE)
     git_path = dir.joinpath(GIT_FOLDER)
-    studioflow_path = dir.joinpath(DOT_STUDIOFLOW_FOLDER_NAME)
-    ignored = [IGNOREFILE.name, GITIGNORE.name, studioflow_path.name, git_path.name]
+    abstra_path = dir.joinpath(DOT_STUDIOFLOW_FOLDER_NAME)
+    ignored = [IGNOREFILE.name, GITIGNORE.name, abstra_path.name, git_path.name]
 
     if IGNOREFILE.exists():
         with open(IGNOREFILE, "r", encoding="utf-8"):
@@ -318,7 +322,6 @@ def get_ignore_files(dir: Path):
         for p in ignored
         if p and not p.startswith("#") and not p.startswith("!")
     ]
-
 
 
 def should_ignore(ignored_paths, _path: Path):

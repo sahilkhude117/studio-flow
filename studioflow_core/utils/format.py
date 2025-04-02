@@ -2,6 +2,7 @@ import re
 
 from unidecode import unidecode
 
+
 def normalize_path(path: str):
     paths = filter(_remove_empty_string_filter, path.split("/"))
     return "/".join(map(_normalize_string, paths))

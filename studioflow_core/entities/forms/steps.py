@@ -6,7 +6,7 @@ from studioflow_core.entities.forms.template import (
     TemplateFunction,
     TemplateGenerator,
     TemplateGeneratorFunction,
-    TemplateWithButtons
+    TemplateWithButtons,
 )
 
 ComputationFunction = Callable[[State], None]

@@ -2,9 +2,11 @@ from typing import Dict, List
 
 from pydantic.dataclasses import dataclass
 
+
 @dataclass
 class Node:
     id: str
+
 
 @dataclass
 class Edge:
@@ -42,4 +44,3 @@ class Graph:
 
     def all_neighbors(self, node_id: str) -> List[Node]:
         return self.next_to(node_id) + self.previous_to(node_id)
-   

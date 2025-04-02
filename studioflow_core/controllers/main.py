@@ -6,31 +6,26 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import flask
 
+from studioflow_core.cloud_api import get_api_key_info, get_project_info
 from studioflow_core.controllers.linters import check_linters
-from studioflow_core.interface.cli.deploy import deploy
-from studioflow_core.settings import Settings
 from studioflow_core.credentials import (
     delete_credentials,
     get_credentials,
     resolve_headers,
     set_credentials,
 )
-from studioflow_core.repositories.execution import ExecutionFilter, ExecutionRepository
-from studioflow_core.cloud_api import get_api_key_info, get_project_info
-from studioflow_core.utils.dot_studioflow import TEST_DATA_FILE
-from studioflow_core.repositories.factory import Repositories
-from studioflow_core.repositories.keyvalue import KVRepository
-from studioflow_core.repositories.jwt_signer import EditorJWTRepository, JWTRepository
-from studioflow_core.repositories.email import EmailRepository
-from studioflow_core.repositories.tasks import TasksRepository, ExecutionTasksResponse
-from studioflow_core.repositories.users import UsersRepository
-from studioflow_core.repositories.roles import RolesRepository
-from studioflow_core.repositories.producer import ProducerRepository
-from studioflow_core.repositories.execution_logs import ExecutionLogsRepository, LogEntry
-from studioflow_core.services.requirements import RequirementsRepository
-from studioflow_core.utils.file import files_from_directory, module2path, path2module
-from studioflow_core.utils.validate import validate_json
 from studioflow_core.entities.execution_context import ScriptContext
+from studioflow_core.interface.cli.deploy import deploy
+from studioflow_core.repositories.email import EmailRepository
+from studioflow_core.repositories.execution import ExecutionFilter, ExecutionRepository
+from studioflow_core.repositories.execution_logs import (
+    ExecutionLogsRepository,
+    LogEntry,
+)
+from studioflow_core.repositories.factory import Repositories
+from studioflow_core.repositories.jwt_signer import EditorJWTRepository, JWTRepository
+from studioflow_core.repositories.keyvalue import KVRepository
+from studioflow_core.repositories.producer import ProducerRepository
 from studioflow_core.repositories.project.project import (
     FormStage,
     HookStage,
@@ -39,21 +34,68 @@ from studioflow_core.repositories.project.project import (
     ScriptStage,
     Stage,
     StageWithFile,
-    StyleSettingsWithSidebar
+    StyleSettingsWithSidebar,
 )
+from studioflow_core.repositories.roles import RolesRepository
+from studioflow_core.repositories.tasks import ExecutionTasksResponse, TasksRepository
+from studioflow_core.repositories.users import UsersRepository
+from studioflow_core.services.requirements import RequirementsRepository
+from studioflow_core.settings import Settings
 from studioflow_core.templates import (
+    ensure_studioflowignore,
+    ensure_gitignore,
     new_form_code,
     new_hook_code,
     new_job_code,
     new_script_code,
 )
+from studioflow_core.utils.dot_studioflow import TEST_DATA_FILE
+from studioflow_core.utils.file import files_from_directory, module2path, path2module
+from studioflow_core.utils.validate import validate_json
+
 
 class UnknownNodeTypeError(Exception):
     def __init__(self, node_type: str):
         self.node_type = node_type
 
     def __str__(self):
-        return f'Unknown Node type {self.node_type}'
+        return f"Unknown node type {self.node_type}"
+
+
+class SelfTransitionError(Exception):
+    def __init__(self, node_type: str, node_id: str):
+        self.node_type = node_type
+        self.node_id = node_id
+
+    def __str__(self):
+        return "You can't add a transition to itself."
+
+
+class TransitionToJobError(Exception):
+    def __init__(
+        self, source_type: str, source_id: str, target_type: str, target_id: str
+    ):
+        self.source_type = source_type
+        self.source_id = source_id
+        self.target_type = target_type
+        self.target_id = target_id
+
+    def __str__(self):
+        return "You can't add a transition to a job. Use a script instead."
+
+
+class DoubleTransitionError(Exception):
+    def __init__(
+        self, source_type: str, source_id: str, target_type: str, target_id: str
+    ):
+        self.source_type = source_type
+        self.source_id = source_id
+        self.target_type = target_type
+        self.target_id = target_id
+
+    def __str__(self):
+        return "You can't add the same transition twice."
+
 
 class MainController:
     kv_repository: KVRepository
@@ -70,7 +112,9 @@ class MainController:
     def __init__(self, repositories: Repositories):
         ProjectRepository.initialize_or_migrate()
 
-        RequirementsRepository.ensure('studioflow')
+        RequirementsRepository.ensure("abstra")
+        ensure_studioflowignore(Settings.root_path)
+        ensure_gitignore(Settings.root_path)
 
         self.repositories = repositories
 
@@ -97,7 +141,7 @@ class MainController:
             raise Exception(
                 "Please fix all linter issues before deploying your project."
             )
-        
+
         deploy()
 
     def reset_repositories(self):
@@ -121,7 +165,7 @@ class MainController:
         job_ids = [stage.id for stage in project.jobs]
         script_ids = [stage.id for stage in project.scripts]
         return job_ids + script_ids
-    
+
     def __ensure_case(self, path: str):
         file_dirs = [p for p in Settings.root_path.iterdir()]
         if path in file_dirs:
@@ -136,7 +180,6 @@ class MainController:
             f"File {path} already exists with different casing. Conflict with files ({', '.join(p.name for p in conflicting_paths)})"
         )
 
-  
     def init_code_file(self, path: str, code: str):
         if Settings.root_path.joinpath(path).is_file():
             self.__ensure_case(path)
@@ -161,6 +204,9 @@ class MainController:
 
     def check_file(self, file_path: str):
         return Settings.root_path.joinpath(file_path).is_file()
+
+    def check_files(self, file_paths: List[str]):
+        return {file_path: self.check_file(file_path) for file_path in file_paths}
 
     def list_files(self, path: str = ".", mode: str = "file"):
         parent_path = Settings.root_path.joinpath(path)
@@ -229,15 +275,15 @@ class MainController:
         ProjectRepository.save(project)
 
         return script
-    
+
     def get_scripts(self) -> List[ScriptStage]:
         project = ProjectRepository.load()
         return project.scripts
-    
+
     def get_script(self, id: str) -> Optional[ScriptStage]:
         project = ProjectRepository.load()
         return project.get_script(id)
-    
+
     def delete_script(self, id: str, remove_file: bool = False):
         project = ProjectRepository.load()
         project.delete_stage(id, remove_file)
@@ -252,15 +298,15 @@ class MainController:
         project.add_stage(form)
         ProjectRepository.save(project)
         return form
-    
+
     def get_forms(self) -> List[FormStage]:
         project = ProjectRepository.load()
         return project.forms
-    
+
     def get_form(self, id: str) -> Optional[FormStage]:
         project = ProjectRepository.load()
         return project.get_form(id)
-    
+
     def get_form_by_path(self, path: str) -> Optional[FormStage]:
         project = ProjectRepository.load()
         return project.get_form_by_path(path)
@@ -362,15 +408,16 @@ class MainController:
         project = ProjectRepository.load()
         return project.workflow_stages
 
+    # Login
     def get_credentials(self):
         return get_credentials()
-    
+
     def get_login(self):
         headers = resolve_headers()
         if not headers:
             return {"logged": False, "reason": "NO_API_TOKEN"}
         return get_api_key_info(headers)
-    
+
     def create_login(self, token):
         set_credentials(token)
         return self.get_login()
@@ -378,7 +425,7 @@ class MainController:
     def delete_login(self):
         delete_credentials()
         return self.get_login()
-    
+
     # Project
     def get_project_info(self):
         headers = resolve_headers()
@@ -396,7 +443,7 @@ class MainController:
         response = project.update_access_controls(changes)
         ProjectRepository.save(project)
         return response
-    
+
     def get_access_control_by_stage_id(self, id):
         project = ProjectRepository.load()
         return project.get_access_control_by_stage_id(id)

@@ -3,7 +3,7 @@ import pathlib
 import sys
 import typing
 
-from studioflow_core.environment import DEFAULT_PORT
+from studioflow_core.environment import DEFAULT_PORT, PROJECT_URL
 from studioflow_core.utils import get_free_port
 
 
@@ -11,6 +11,8 @@ class SettingsController(object):
     _instance: typing.Optional["SettingsController"] = None
     _root_path: typing.Optional[pathlib.Path] = None
     _server_port: typing.Optional[int] = None
+    _public_url: typing.Optional[str] = PROJECT_URL
+
 
     def __new__(cls):
         if not cls._instance:
@@ -43,6 +45,10 @@ class SettingsController(object):
         
         SettingsController._server_port = port
 
+    @staticmethod
+    def set_public_url(public_url: str):
+        SettingsController._public_url = public_url
+
     @property
     def root_path(self) -> pathlib.Path:
         if SettingsController._root_path is None:
@@ -55,4 +61,13 @@ class SettingsController(object):
             raise Exception("You must set the sever before using it")
         return SettingsController._server_port
     
+    def has_public_url(self) -> bool:
+        return SettingsController._public_url is not None
+
+    @property
+    def public_url(self) -> str:
+        if SettingsController._public_url is None:
+            raise Exception("You must set the public url before using it")
+        return SettingsController._public_url
+
 Settings = SettingsController()

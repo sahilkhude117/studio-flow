@@ -3,7 +3,7 @@
 # studio-flow
 /studioflow/__pycache__
 
-# Core
+## Core
 /studioflow_core/__pycache__
 
 # Cloud Api
@@ -11,13 +11,22 @@
 
 # Controllers
 /studioflow_core/controllers/__pycache__
+/studioflow_core/controllers/common/__pycache__
+/studioflow_core/controllers/service/__pycache__
+
+# Email Templates
+/studioflow_core/email_templates/__pycache__
 
 # Entities
 /studioflow_core/entities/__pycache__
+/studioflow_core/entities/forms/__pycache__
+/studioflow_core/entities/forms/widgets/__pycache__
 
 # Interface 
-#  - cli
+/studioflow_core/interface/__pycache__ 
 /studioflow_core/interface/cli/__pycache__ 
+/studioflow_core/interface/contract/__pycache__ 
+/studioflow_core/interface/sdk/__pycache__ 
 
 # linter
 /studioflow_core/linter/__pycache__ 
@@ -27,7 +36,9 @@
 /studioflow_core/repositories/__pycache__
 /studioflow_core/repositories/project/__pycache__
 /studioflow_core/repositories/project/json_migrations/__pycache__
+/studioflow_core/repositories/project/json_migrations/tasks/__pycache__
 /studioflow_core/repositories/services/__pycache__
+/studioflow_core/repositories/services/roles/__pycache__
 
 # server
 /studioflow_core/server/__pycache__
@@ -44,6 +55,8 @@
 # utils
 /studioflow_core/utils/__pycache__
 
+# widgets
+/studioflow_core/widgets/__pycache__
 
 
 # Statics

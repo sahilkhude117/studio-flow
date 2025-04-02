@@ -16,7 +16,7 @@ from studioflow_core.repositories.ai import (
     LocalAiApiHttpClient,
     ProductionAiApiHttpClient
 )
-from studioflow_core.repositories.connectores import (
+from studioflow_core.repositories.connectors import (
     ConnectorsRepository,
     LocalConnectorsRepository,
     ProductionConnectorsRepository

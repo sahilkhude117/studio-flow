@@ -10,6 +10,7 @@ from studioflow_core.entities.forms.widgets.widget_base import BaseWidget, Input
 class Button:
     label: str
 
+
 class NextButton(Button):
     def __init__(self):
         super().__init__("i18n_next_action")
