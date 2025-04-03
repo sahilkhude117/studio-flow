@@ -2,7 +2,7 @@
 import React from 'react';
 import { GitBranch, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 type EmptyStateProps = {
   title: string;
@@ -20,7 +20,7 @@ export const EmptyState = ({ title, description, buttonText, buttonLink }: Empty
       <h2 className="text-xl font-medium mb-2">{title}</h2>
       <p className="text-muted-foreground mb-6 max-w-md">{description}</p>
       <Button asChild>
-        <Link to={buttonLink} className="flex items-center gap-2">
+        <Link href={buttonLink} className="flex items-center gap-2">
           <PlusCircle className="h-4 w-4" />
           {buttonText}
         </Link>

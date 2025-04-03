@@ -1,6 +1,6 @@
-
+'use client'
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { PlusCircle, GitBranch, Mail, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FlowCard } from '@/components/FlowCard';
@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
+import Image from 'next/image';
 
 const Dashboard = () => {
   const { flows, toggleFlowStatus, deleteFlow } = useFlowContext();
@@ -62,11 +63,11 @@ const Dashboard = () => {
   const getServiceIcon = (service: string, type: string) => {
     switch(service) {
       case 'mailchimp':
-        return <GitBranch className="h-4 w-4 text-red-600" />;
+        return 'https://cdn.activepieces.com/pieces/mailchimp.png';
       case 'sendgrid':
-        return <Mail className="h-4 w-4 text-blue-600" />;
+        return 'https://cdn.activepieces.com/pieces/sendgrid.png';
       case 'chatgpt':
-        return <MessageSquare className="h-4 w-4 text-green-600" />;
+        return 'https://cdn.activepieces.com/pieces/openai.png';
       default:
         return null;
     }
@@ -77,7 +78,7 @@ const Dashboard = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Your Flows</h1>
         <Button asChild>
-          <Link to="/flow/new" className="flex items-center gap-2">
+          <Link href="/flow/new" className="flex items-center gap-2">
             <PlusCircle className="h-4 w-4" />
             New Flow
           </Link>
@@ -92,7 +93,7 @@ const Dashboard = () => {
           buttonLink="/flow/new"
         />
       ) : (
-        <div className="bg-white rounded-md border shadow-sm">
+        <div className="bg-white rounded-md border shadow-sm ml-20 mr-20">
           <Table>
             <TableHeader>
               <TableRow>
@@ -107,20 +108,25 @@ const Dashboard = () => {
               {flows.map((flow) => (
                 <TableRow key={flow.id}>
                   <TableCell className="font-medium">
-                    <Link to={`/flow/${flow.id}`} className="text-blue-600 hover:underline">
+                    <Link href={`/flow/${flow.id}`} className="text-black-600 hover:underline">
                       {flow.name}
                     </Link>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center">
                       {flow.steps.map((step, index) => (
                         <React.Fragment key={index}>
-                          {index > 0 && <div className="h-px w-4 bg-gray-300" />}
-                          <div className={`p-1.5 rounded ${
+                          <div className={`p-1.5 rounded-full ${
                             step.service === 'mailchimp' ? 'bg-red-100' : 
                             step.service === 'chatgpt' ? 'bg-green-100' : 'bg-blue-100'
                           }`}>
-                            {getServiceIcon(step.service, step.type)}
+                            <Image
+                              src={getServiceIcon(step.service, step.type) || ''}
+                              alt='S'
+                              width={20}
+                              height={20}
+                            />
+                            
                           </div>
                         </React.Fragment>
                       ))}
@@ -144,7 +150,7 @@ const Dashboard = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link to={`/flow/${flow.id}`}>Edit</Link>
+                          <Link href={`/flow/${flow.id}`}>Edit</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleDuplicate(flow.id)}>
                           Duplicate

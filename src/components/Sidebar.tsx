@@ -1,6 +1,7 @@
-
+'use client'
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Home, Mail, GitBranch, Database, Settings, HelpCircle, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +16,7 @@ type SidebarItemProps = {
 const SidebarItem = ({ icon: Icon, label, to, badge, active }: SidebarItemProps) => {
   return (
     <Link
-      to={to}
+      href={to}
       className={cn(
         'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
         active
@@ -49,13 +50,12 @@ const SidebarSection = ({ title, children }: SidebarSectionProps) => {
 };
 
 export const Sidebar = () => {
-  const location = useLocation();
-  const currentPath = location.pathname;
+  const currentPath = usePathname()
 
   return (
     <div className="w-64 h-screen bg-sidebar flex flex-col border-r">
       <div className="p-4 border-b">
-        <Link to="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <div className="bg-studio-600 text-white p-1 rounded">
             <GitBranch className="h-5 w-5" />
           </div>

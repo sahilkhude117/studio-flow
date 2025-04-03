@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { MoreHorizontal, GitBranch, Mail } from 'lucide-react';
 import { Flow } from '@/contexts/FlowContext';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,7 @@ export const FlowCard = ({ flow, onToggleStatus, onDelete, onDuplicate }: FlowCa
   return (
     <div className="bg-white rounded-lg border p-4 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-4">
-        <Link to={`/flow/${flow.id}`} className="font-medium text-studio-700 hover:text-studio-800">
+        <Link href={`/flow/${flow.id}`} className="font-medium text-studio-700 hover:text-studio-800">
           {flow.name}
         </Link>
         <div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ export const FlowCard = ({ flow, onToggleStatus, onDelete, onDuplicate }: FlowCa
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link to={`/flow/${flow.id}`}>Edit</Link>
+                <Link href={`/flow/${flow.id}`}>Edit</Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDuplicate(flow.id)}>Duplicate</DropdownMenuItem>
               <DropdownMenuItem 

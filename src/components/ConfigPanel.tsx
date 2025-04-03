@@ -249,7 +249,7 @@ export const ConfigPanel = ({ type, onClose, onSave }: ConfigPanelProps) => {
 
   return (
     <Sheet open onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-md">
+      <SheetContent className="sm:max-w-md p-5">
         <SheetHeader>
           <SheetTitle>{getTitle()}</SheetTitle>
         </SheetHeader>

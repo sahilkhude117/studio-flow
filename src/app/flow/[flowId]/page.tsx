@@ -1,6 +1,8 @@
-
+'use client'
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { ChevronLeft, Save, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +13,7 @@ import { useFlowContext } from '@/contexts/FlowContext';
 
 const FlowEditor = () => {
   const { flowId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { addFlow, flows, updateFlow } = useFlowContext();
   const isNew = flowId === 'new';
   
@@ -57,11 +59,11 @@ const FlowEditor = () => {
     if (isNew) {
       addFlow(flow);
       toast.success('Flow created successfully!');
-      navigate('/'); // Redirect to the dashboard after saving
-    } else if (flowId) {
+      router.push('/'); // Redirect to the dashboard after saving
+    } else if (flowId) { //@ts-ignore
       updateFlow(flowId, flow);
       toast.success('Flow updated successfully!');
-      navigate('/'); // Redirect to the dashboard after updating
+      router.push('/'); // Redirect to the dashboard after updating
     }
   };
 
@@ -100,7 +102,7 @@ const FlowEditor = () => {
       <div className="border-b p-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/" className="flex items-center gap-1">
+            <Link href="/" className="flex items-center gap-1">
               <ChevronLeft className="h-4 w-4" /> Back
             </Link>
           </Button>
@@ -139,7 +141,7 @@ const FlowEditor = () => {
       {/* Main Content - Make it scrollable */}
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 overflow-auto">
-          <FlowCanvas 
+          <FlowCanvas //@ts-ignore
             flowId={flowId} 
             isNew={isNew}
             onConfigOpen={handleConfigOpen}

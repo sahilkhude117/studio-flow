@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,11 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ReactFlow , Background} from '@xyflow/react';
 import { NodeSelector } from './NodeSelector';
 import { useFlowContext, Flow } from '@/contexts/FlowContext';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ScrollArea } from './ui/scroll-area';
+import Image from 'next/image';
 
 type FlowCanvasProps = {
   flowId?: string;
@@ -27,7 +30,7 @@ type FlowStep = {
 };
 
 export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { addFlow, flows, updateFlow } = useFlowContext();
   
   const [flowSteps, setFlowSteps] = useState<FlowStep[]>(isNew ? [] : (
@@ -85,6 +88,7 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
   };
 
   return (
+  <div>
     <div className="flow-canvas p-8 min-h-[800px]">
       <div className="max-w-4xl mx-auto flex flex-col items-center">
         {/* Trigger Node */}
@@ -106,9 +110,12 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
             }}
           >
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mb-2">
-              <svg className="w-5 h-5 text-red-600" viewBox="0 0 24 24" fill="none">
-                <path d="M20 4L3 11L10 14M20 4L13 21L10 14M20 4L10 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <Image
+                src={'https://cdn.activepieces.com/pieces/mailchimp.png'}
+                alt='mailchimp'
+                width={20}
+                height={20}
+              />
             </div>
             <span className="font-medium text-sm">Mailchimp</span>
             <span className="text-xs text-muted-foreground">New subscriber</span>
@@ -149,15 +156,19 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
                     : 'bg-blue-100'
                 } rounded-full flex items-center justify-center mb-2`}>
                   {step.service === 'chatgpt' ? (
-                    <svg className="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M9 10C9 9.44772 9.44772 9 10 9H14C14.5523 9 15 9.44772 15 10V13C15 13.5523 14.5523 14 14 14H10C9.44772 14 9 13.5523 9 13V10Z" stroke="currentColor" strokeWidth="2"/>
-                      <path d="M8 16L16 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
+                    <Image
+                      src={'https://cdn.activepieces.com/pieces/openai.png'}
+                      alt='mailchimp'
+                      width={20}
+                      height={20}
+                    />
                   ) : (
-                    <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none">
-                      <path d="M22 5L11 5M9 5L2 5M22 12L11 12M9 12L2 12M22 19L11 19M9 19L2 19M12 3V7M12 10V14M12 17V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    <Image
+                      src={'https://cdn.activepieces.com/pieces/sendgrid.png'}
+                      alt='mailchimp'
+                      width={20}
+                      height={20}
+                    />
                   )}
                 </div>
                 <span className="font-medium text-sm">{step.service === 'chatgpt' ? 'ChatGPT' : 'SendGrid'}</span>
@@ -241,5 +252,6 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
         </DialogContent>
       </Dialog>
     </div>
+  </div>
   );
 };

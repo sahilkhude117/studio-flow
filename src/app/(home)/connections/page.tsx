@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { PlusCircle, Check, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
@@ -130,7 +130,7 @@ const Connections = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Connections</h1>
         <Button asChild>
-          <Link to="#" className="flex items-center gap-2">
+          <Link href="#" className="flex items-center gap-2">
             <PlusCircle className="h-4 w-4" />
             Add Connection
           </Link>
