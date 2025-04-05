@@ -1,16 +1,14 @@
 
-
+import sys
 from pathlib import Path
 import environ
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR.parent))
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = 'django-insecure-h8nkroq6cjkle@zre7-hk8d%ss40b+vlrt&m-h5e4jot*(@odx'
@@ -29,6 +27,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'webhook',
+    'database'
 ]
 
 MIDDLEWARE = [
