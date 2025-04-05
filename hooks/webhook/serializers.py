@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Flow, Trigger, Action, AvailableAction, AvailableTrigger, FlowRun, FlowRunOutbox
+from database.models import User, Flow, Trigger, Action, AvailableAction, AvailableTrigger, FlowRun, FlowRunOutbox
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

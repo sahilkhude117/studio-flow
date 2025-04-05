@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-from .models import User, Flow, FlowRun, FlowRunOutbox
+from database.models import User, Flow, FlowRun, FlowRunOutbox
 from .serializers import UserSerializer
 
 @api_view(['POST'])
