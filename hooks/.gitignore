@@ -1,0 +1,4 @@
+/hooks/__pycache__
+/webhook/__pycache__
+/webhook/migrations/__pycache__
+.env
