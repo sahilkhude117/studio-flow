@@ -1,0 +1,27 @@
+ERROR 2025-04-05 12:09:21,429 kafka_service Failed tp connect to Kafka: NoBrokersAvailable
+ERROR 2025-04-05 12:14:28,761 kafka_service Failed to connect to Kafka: NoBrokersAvailable
+INFO 2025-04-05 12:43:09,342 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 12:43:09,347 kafka_service Kafka producer connection closed
+INFO 2025-04-05 12:44:14,811 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 12:44:25,310 kafka_service Kafka producer connection closed
+INFO 2025-04-05 12:50:28,119 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 12:50:28,123 kafka_service Kafka producer connection closed
+INFO 2025-04-05 12:50:39,902 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 12:50:39,906 kafka_service Kafka producer connection closed
+INFO 2025-04-05 12:51:25,336 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 12:51:28,794 kafka_service Kafka producer connection closed
+INFO 2025-04-05 12:51:52,840 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 12:51:59,873 kafka_service Kafka producer connection closed
+INFO 2025-04-05 12:52:37,120 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 12:52:45,791 kafka_service Kafka producer connection closed
+ERROR 2025-04-05 14:22:55,990 kafka_service Failed to connect to Kafka: NoBrokersAvailable
+ERROR 2025-04-05 14:24:01,016 kafka_service Failed to connect to Kafka: NoBrokersAvailable
+INFO 2025-04-05 14:24:19,077 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 14:24:23,939 kafka_service Successfully sent 1 messages to kafka
+INFO 2025-04-05 14:24:23,941 kafka_service Kafka producer connection closed
+INFO 2025-04-05 14:26:52,990 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 14:26:56,724 kafka_service Successfully sent 1 messages to kafka
+INFO 2025-04-05 14:27:04,094 kafka_service Kafka producer connection closed
+INFO 2025-04-05 14:30:30,532 kafka_service Successfully connected to Kafka
+INFO 2025-04-05 14:30:33,747 kafka_service Successfully sent 1 messages to kafka
+INFO 2025-04-05 14:32:17,095 kafka_service Kafka producer connection closed

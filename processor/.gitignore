@@ -1,0 +1,7 @@
+.env
+/kafka_processor/__pycache__
+/kafka_processor/services/__pycache__
+/kafka_processor/management/__pycache__
+/kafka_processor/management/commands/__pycache__
+
+/processor/__pycache__
