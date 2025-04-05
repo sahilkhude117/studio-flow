@@ -7,9 +7,8 @@ from .serializers import UserSerializer
 
 @api_view(['POST'])
 def catch_hook(request, user_id, flow_id):
-    """
-    Process incoming webhook data and create FlowRun and FlowRunOutbox records
-    """
+    """ Process incoming webhook data and create FlowRun and FlowRunOutbox records """
+
     try:
         flow = Flow.objects.get(id=flow_id)
 
@@ -34,11 +33,13 @@ def catch_hook(request, user_id, flow_id):
             {'error': f'Flow with ID {flow_id} not found'},
             status=status.HTTP_404_NOT_FOUND
         )
+    
     except Exception as e:
         return Response(
             {"error": str(e)}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
 
 @api_view(['POST'])
 def create_user(request):
