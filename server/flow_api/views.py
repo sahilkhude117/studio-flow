@@ -4,7 +4,33 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from database.models import Flow, Trigger, Action, AvailableAction, AvailableTrigger
-from .serializers import FlowCreateSerializer, FlowListSerializer
+from .serializers import FlowCreateSerializer, FlowListSerializer , FlowDetailSerializer
+from django.shortcuts import get_object_or_404
+
+# Req: GET, POST
+# Endpoint: /api/v1/flow/:flowId
+class FlowDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, flowId):
+        
+        flow = get_object_or_404(
+            Flow.objects.prefetch_related(
+                'actions',
+                'actions__actionId',
+                'trigger',
+                'trigger__triggerId'
+            ),
+            id=flowId,
+            userId=request.user
+        )
+
+        serializer = FlowDetailSerializer(flow)
+
+        return Response({
+            'flow': serializer.data
+        })
+
 
 # Req: GET, POST
 # Endpoint: /api/v1/flow/
