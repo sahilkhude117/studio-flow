@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'user_api',
     'database',
-    'flow_api'
+    'flow_api',
+    'trigger_api',
+    'action_api',
 ]
 
 # settings.py
