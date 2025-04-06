@@ -10,6 +10,8 @@ sys.path.insert(0, str(BASE_DIR.parent))
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+# settings.py
+AUTH_USER_MODEL = 'database.User'
 
 SECRET_KEY = 'django-insecure-h8nkroq6cjkle@zre7-hk8d%ss40b+vlrt&m-h5e4jot*(@odx'
 
