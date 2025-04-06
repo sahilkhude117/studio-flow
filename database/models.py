@@ -1,17 +1,32 @@
-from django.db import models
 import uuid
-import json
 
-class User(models.Model):
-    name = models.CharField(max_length=100)
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class User(AbstractUser):
+    username = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
-
-    class Meta:
-        db_table = 'User'
-
-    def __str__(self) -> str:
-        return f'{self.name} ({self.email})'
+    
+    # Fix the related_name for these fields
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_name='database_user_set',  # Custom related_name
+        related_query_name='database_user'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name='database_user_set',  # Custom related_name
+        related_query_name='database_user'
+    )
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'name']
     
 class Flow(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
