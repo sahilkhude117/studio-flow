@@ -4,11 +4,28 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from database.models import Flow, Trigger, Action, AvailableAction, AvailableTrigger
-from .serializers import FlowCreateSerializer
+from .serializers import FlowCreateSerializer, FlowListSerializer
 
-class FlowCreateView(APIView):
+# Req: GET, POST
+# Endpoint: /api/v1/flow/
+class FlowView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+
+        flows = Flow.objects.filter(userId=request.user).prefetch_related(
+            'actions',
+            'actions__actionId',  # This is the AvailableAction 
+            'trigger',
+            'trigger__triggerId'  # This is the AvailableTrigger
+        )
+
+        serializer = FlowListSerializer(flows, many=True)
+
+        return Response({
+            'flows': serializer.data
+        })
+    
     def post(self, request):
         serializer = FlowCreateSerializer(data=request.data)
 
@@ -67,3 +84,6 @@ class FlowCreateView(APIView):
                 "message": "Error creating flow",
                 "error": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+        
