@@ -5,3 +5,5 @@
 /kafka_processor/management/commands/__pycache__
 
 /processor/__pycache__
+
+processor.log

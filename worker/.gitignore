@@ -1,0 +1,10 @@
+.env
+/core/__pycache__
+/core/services/__pycache__
+/core/management/__pycache__
+/core/management/commands/__pycache__
+
+/worker/__pycache__
+
+processor.log
+worker.log
