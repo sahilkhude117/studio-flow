@@ -1,3 +1,4 @@
 .env
 /server/__pycache__
 /user_api/__pycache__
+/flow_api/__pycache__
