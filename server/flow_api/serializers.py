@@ -35,6 +35,13 @@ class TriggerDetailSerializer(serializers.ModelSerializer):
     def get_type(self, obj):
         return AvailableTriggerSerializer(obj.triggerId).data
 
+class FlowDetailSerializer(serializers.ModelSerializer):
+    actions = ActionDetailSerializer(many=True, read_only=True)
+    trigger = TriggerDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Flow
+        fields = ['id', 'triggerId', 'actions', 'trigger']
 
 class FlowListSerializer(serializers.ModelSerializer):
     actions = ActionDetailSerializer(many=True, read_only=True)
