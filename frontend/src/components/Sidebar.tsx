@@ -68,21 +68,21 @@ export const Sidebar = () => {
           <SidebarItem
             icon={GitBranch}
             label="Flows"
-            to="/"
-            active={currentPath === '/' || currentPath.startsWith('/flow')}
+            to="/flows"
+            active={currentPath === '/flows' || currentPath.startsWith('/flow/flows')}
           />
           <SidebarItem
             icon={Mail}
             label="Runs"
-            to="/runs"
-            active={currentPath === '/runs'}
+            to="/flows/runs"
+            active={currentPath === '/flows/runs'}
             badge={3}
           />
           <SidebarItem
             icon={Database}
             label="Connections"
-            to="/connections"
-            active={currentPath === '/connections'}
+            to="/flows/connections"
+            active={currentPath === '/flows/connections'}
           />
         </SidebarSection>
 
@@ -90,8 +90,8 @@ export const Sidebar = () => {
           <SidebarItem
             icon={Settings}
             label="Settings"
-            to="/settings"
-            active={currentPath === '/settings'}
+            to="/flows/settings"
+            active={currentPath === '/flows/settings'}
           />
         </SidebarSection>
       </div>
