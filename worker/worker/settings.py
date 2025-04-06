@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-txs8*j3*@=1(@cu8d6j)sdxs!z(_%7^v*h4=r04848en@lbu96'
+SECRET_KEY = 'django-insecure-xlqnvkg^wpfkoc9c=sqm67lf&k*cltj&&p7us48@n24!9q+_oe'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +37,39 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core'
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'processor.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'kafka_processor': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,16 +111,6 @@ DATABASES = {
     }
 }
 
-# Kafka Consumer Configuration
-KAFKA_CONSUMER_CONFIG = {
-    'CLIENT_ID': 'worker-consumer',
-    'BROKERS': ['localhost:9092'],
-    'TOPIC_NAME': 'flow-events',
-    'GROUP_ID': 'main-worker',
-    'AUTO_COMMIT': False,
-    'FROM_BEGINNING': True,
-    'PROCESS_DELAY_MS': 500,  # Matching the 500ms delay in the Node.js code
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
