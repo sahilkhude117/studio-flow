@@ -32,6 +32,31 @@ class FlowDetailView(APIView):
         })
 
 
+class ToggleFlowStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            flow = Flow.objects.get(pk=pk, userId=request.user)
+            flow.active = not flow.active
+            flow.save()
+            return Response({"message": "Flow status updated", 'active': flow.active})
+        except Flow.DoesNotExist:
+            return Response({"error": "Flow not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class DeleteFlowView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            flow = Flow.objects.get(pk=pk, userId=request.user)
+            flow.delete()
+            return Response({"message": "Flow deleted"})
+        except Flow.DoesNotExist:
+            return Response({"error": "Flow not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
 # Req: GET, POST
 # Endpoint: /api/v1/flow/
 class FlowView(APIView):
@@ -46,10 +71,36 @@ class FlowView(APIView):
             'trigger__triggerId'  # This is the AvailableTrigger
         )
 
-        serializer = FlowListSerializer(flows, many=True)
+        formatted_flows = []
+        for flow in flows:
+            steps = []
 
+            if flow.trigger:
+                steps.append({
+                    'type': 'trigger',
+                    'service': flow.trigger.triggerId.name.lower(),
+                    'logoUrl': flow.trigger.triggerId.image,
+                    'config': flow.trigger.metadata
+                })
+
+            for action in flow.actions.all():
+                steps.append({
+                    'type': 'action',
+                    'service': action.actionId.name.lower(),
+                    'logoUrl': action.actionId.image,
+                    'config': action.metadata
+                })
+
+            formatted_flows.append({
+                'id': str(flow.id),
+                'name': flow.name,
+                'createdAt': flow.createdAt.isoformat(),
+                'active': flow.active,
+                'steps': steps
+            })
+        
         return Response({
-            'flows': serializer.data
+            'flows': formatted_flows
         })
     
     def post(self, request):

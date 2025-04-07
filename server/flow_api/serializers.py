@@ -41,7 +41,7 @@ class FlowDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flow
-        fields = ['id', 'triggerId', 'actions', 'trigger']
+        fields = ['id', 'name', 'createdAt', 'active', 'triggerId', 'actions', 'trigger']
 
 class FlowListSerializer(serializers.ModelSerializer):
     actions = ActionDetailSerializer(many=True, read_only=True)
@@ -49,7 +49,7 @@ class FlowListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Flow
-        fields = ['id', 'userId', 'triggerId', 'actions', 'trigger']
+        fields = ['id', 'name', 'createdAt', 'active', 'userId', 'triggerId', 'actions', 'trigger']
 
 
 class ActionSerializer(serializers.Serializer):
