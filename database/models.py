@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 class User(AbstractUser):
     username = models.CharField(max_length=255)
@@ -30,6 +31,9 @@ class User(AbstractUser):
     
 class Flow(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, default="Untitled")
+    createdAt = models.DateTimeField(default=timezone.now)
+    active = models.BooleanField(default=False)
     triggerId = models.CharField(max_length=100)
     userId = models.ForeignKey(User, on_delete=models.CASCADE, related_name='flows')
 
