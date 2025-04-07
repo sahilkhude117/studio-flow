@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import ForgotPassword from '@/components/ForgotPassword';
 import axios from 'axios';
 import { BACKEND_URL } from '@/lib/config';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { login } = useAuth();
 
   const toggleVisibility = () => {
     setHidePass(!hidePass);
@@ -52,7 +54,15 @@ export default function LoginPage() {
         email,
         password,
       })
-      localStorage.setItem('token', res.data.access);
+      const token = res.data.access;
+      const userData = res.data.user || { 
+        id: res.data.id || '',
+        email: email,
+        username: res.data.username || email.split('@')[0], // Fallback if username not provided
+      };
+
+      login(userData, token);
+
       router.push('/flows')
     } catch (e) {
       setError('Something went wrong. Please try again.');
