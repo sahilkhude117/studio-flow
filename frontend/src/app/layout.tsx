@@ -8,6 +8,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { FlowProvider } from "@/contexts/FlowContext";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,11 +37,13 @@ export default function RootLayout({
       >
           <QueryProvider>
             <TooltipProvider>
+              <AuthProvider>
                 <FlowProvider>
                   <Toaster/>
                   <Sonner/>
                   {children}
                 </FlowProvider>
+                </AuthProvider>
             </TooltipProvider>
           </QueryProvider>
       </body>
