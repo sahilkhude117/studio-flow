@@ -59,19 +59,6 @@ const Dashboard = () => {
       year: 'numeric',
     }).format(date);
   };
-  
-  const getServiceIcon = (service: string, type: string) => {
-    switch(service) {
-      case 'mailchimp':
-        return 'https://cdn.activepieces.com/pieces/mailchimp.png';
-      case 'sendgrid':
-        return 'https://cdn.activepieces.com/pieces/sendgrid.png';
-      case 'chatgpt':
-        return 'https://cdn.activepieces.com/pieces/openai.png';
-      default:
-        return null;
-    }
-  };
 
   return (
     <div className="p-6">
@@ -121,7 +108,7 @@ const Dashboard = () => {
                             step.service === 'chatgpt' ? 'bg-green-100' : 'bg-blue-100'
                           }`}>
                             <Image
-                              src={getServiceIcon(step.service, step.type) || ''}
+                              src={step.logoUrl}
                               alt='S'
                               width={20}
                               height={20}
