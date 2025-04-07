@@ -1,5 +1,8 @@
 'use client'
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { fetchFlows, toggleFlowStatus as toggleFlowApi, deleteFlow as deleteFlowApi } from '@/lib/api/flowApi';
+import { AuthContext } from './AuthContext';
+
 
 export type Flow = {
   id: string;
@@ -8,7 +11,8 @@ export type Flow = {
   active: boolean;
   steps: {
     type: 'trigger' | 'action';
-    service: 'mailchimp' | 'sendgrid' | 'chatgpt';
+    service: string;
+    logoUrl: string;
     config: Record<string, any>;
   }[];
 };
@@ -34,42 +38,22 @@ export const useFlowContext = () => {
 };
 
 export const FlowProvider = ({ children }: { children: ReactNode }) => {
-  const [flows, setFlows] = useState<Flow[]>([
-    {
-      id: '1',
-      name: 'New Subscriber Welcome',
-      createdAt: new Date().toISOString(),
-      active: true,
-      steps: [
-        {
-          type: 'trigger',
-          service: 'mailchimp',
-          config: {
-            event: 'new_subscriber',
-            audienceId: 'audience1',
-          },
-        },
-        {
-          type: 'action',
-          service: 'chatgpt',
-          config: {
-            prompt: 'Create a personalized welcome message for {{subscriber.name}}',
-            outputVariable: 'welcome_message',
-          },
-        },
-        {
-          type: 'action',
-          service: 'sendgrid',
-          config: {
-            template: 'welcome',
-            subject: 'Welcome to our service!',
-            fromEmail: 'welcome@example.com',
-            toEmail: '{{subscriber.email}}',
-          },
-        },
-      ],
-    },
-  ]);
+  const [flows, setFlows] = useState<Flow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { token, isAuthenticated } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      (async () => {
+        const data = await fetchFlows();
+        setFlows(data);
+      })();
+    } else {
+      // Reset flows when logged out
+      setFlows([]);
+    }
+  }, [isAuthenticated, token]);
+
   const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
 
   const addFlow = (flow: Omit<Flow, 'id' | 'createdAt' | 'active'>) => {
@@ -92,7 +76,8 @@ export const FlowProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const deleteFlow = (id: string) => {
+  const deleteFlow = async (id: string) => {
+    await deleteFlowApi(id);
     setFlows((prev) => prev.filter((flow) => flow.id !== id));
     if (selectedFlow?.id === id) {
       setSelectedFlow(null);
@@ -111,10 +96,12 @@ export const FlowProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const toggleFlowStatus = (id: string) => {
+  const toggleFlowStatus = async (id: string) => {
+    const updated = await toggleFlowApi(id);
+
     setFlows((prev) =>
       prev.map((flow) =>
-        flow.id === id ? { ...flow, active: !flow.active } : flow
+        flow.id === id ? { ...flow, active: updated.active } : flow
       )
     );
     
