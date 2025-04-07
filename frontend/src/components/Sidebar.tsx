@@ -54,9 +54,9 @@ export const Sidebar = () => {
 
   return (
     <div className="w-64 h-screen bg-sidebar flex flex-col border-r">
-      <div className="p-4 border-b">
+      <div className="p-5 border-b mt-4">
         <Link href="/" className="flex items-center gap-2">
-          <div className="bg-studio-600 text-white p-1 rounded">
+          <div className="bg-black text-white p-1 rounded">
             <GitBranch className="h-5 w-5" />
           </div>
           <span className="text-lg font-semibold">StudioFlow</span>
