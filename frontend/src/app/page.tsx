@@ -405,7 +405,7 @@ export default function LandingPage() {
                 Connect apps, automate workflows, and save time.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up delay-300 mt-15">
-                <Button className="bg-gradient-to-r from-primary to-primary/80 text-white text-lg h-12 px-6 rounded-full shadow-md hover:scale-105 hover:shadow-lg transition-transform duration-300">
+                <Button  onClick = {handleSignUp} className=" cursor-pointer bg-gradient-to-r from-primary to-primary/80 text-white text-lg h-12 px-6 rounded-full shadow-md hover:scale-105 hover:shadow-lg transition-transform duration-300">
                   Get Started for Free
                 </Button>
                 <Button
