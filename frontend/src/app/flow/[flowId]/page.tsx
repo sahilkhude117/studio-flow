@@ -3,32 +3,76 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft, Save, PlayCircle } from 'lucide-react';
+import { ChevronLeft, Save, PlayCircle, Loader2Icon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FlowCanvas } from '@/components/FlowCanvas';
-import { ConfigPanel } from '@/components/ConfigPanel';
+import { ConfigPanel, serviceIds } from '@/components/ConfigPanel';
 import { toast } from 'sonner';
 import { useFlowContext } from '@/contexts/FlowContext';
 
 const FlowEditor = () => {
   const { flowId } = useParams();
   const router = useRouter();
-  const { addFlow, flows, updateFlow } = useFlowContext();
+  const { 
+    addFlow, 
+    updateFlow,
+    flows,
+    selectFlow,
+    selectedFlow,
+    loading,
+    error,
+    draftFlow,
+    updateDraftFlowName,
+    updateDraftFlowActions,
+    updateDraftFlowTrigger,
+    updateDraftFlowActive
+  } = useFlowContext();
   const isNew = flowId === 'new';
   
-  // Get existing flow data if editing
   const existingFlow = !isNew ? flows.find(flow => flow.id === flowId) : null;
+
+  useEffect(() => {
+    setDraft()
+  },[])
+
+  const setDraft = () => {
+    if (existingFlow) {
+      updateDraftFlowName(existingFlow.name)
+      updateDraftFlowActive(existingFlow.active)
   
+      existingFlow.steps.forEach(step => {
+        const { type, service, config } = step;
+  
+        if (service === 'chatgpt') {
+          const serviceId = serviceIds.chatgpt
+        } else if (service === 'mailchimp'){
+          const serviceId = serviceIds.mailchimp
+        } else if ( service === 'sendgrid') {
+          const serviceId = serviceIds.sendgrid
+        }
+        
+        if (type === 'trigger') {
+          const serviceId = serviceIds.mailchimp;
+          updateDraftFlowTrigger(serviceId, config);
+        } else if (type === 'action') {
+          updateDraftFlowActions(service, config)
+        }
+      })
+    }
+  }
+  
+
   const [flowName, setFlowName] = useState(isNew ? 'Untitled Flow' : (existingFlow?.name || 'My Flow'));
   const [showConfig, setShowConfig] = useState(false);
   const [configType, setConfigType] = useState<'mailchimp' | 'sendgrid' | 'chatgpt'>('mailchimp');
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [flowSteps, setFlowSteps] = useState<Array<{
     type: 'trigger' | 'action';
-    service: 'mailchimp' | 'sendgrid' | 'chatgpt';
+    service: string;
+    logoUrl: string;
     config: Record<string, any>;
-  }>>(existingFlow?.steps || []);
+  }>>([]);
   
   const [stepConfigs, setStepConfigs] = useState<Record<string, any>>({
     mailchimp: { apiKey: '', audienceId: '' },
@@ -36,34 +80,45 @@ const FlowEditor = () => {
     sendgrid: { apiKey: '', fromEmail: '', templateId: '' }
   });
 
-  // Handle config panel opening
-  const handleConfigOpen = (type: 'mailchimp' | 'sendgrid' | 'chatgpt') => {
+  const handleConfigOpen = (type: 'mailchimp' | 'sendgrid' | 'chatgpt', stepIndex: number) => {
     setConfigType(type);
+    setCurrentStep(stepIndex);
     setShowConfig(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await updateDraftFlowName(flowName);
+    await updateDraftFlowActive(true);
     // Create the flow object
-    const flow = {
-      name: flowName,
-      steps: flowSteps.length > 0 ? flowSteps : [
-        {
-          type: 'trigger' as const,
-          service: 'mailchimp' as const,
-          config: stepConfigs.mailchimp
-        },
-        // Add more steps based on UI selections
-      ]
-    };
+    const flow = draftFlow;
+
     
-    if (isNew) {
-      addFlow(flow);
-      toast.success('Flow created successfully!');
-      router.push('/'); // Redirect to the dashboard after saving
-    } else if (flowId) { //@ts-ignore
-      updateFlow(flowId, flow);
-      toast.success('Flow updated successfully!');
-      router.push('/'); // Redirect to the dashboard after updating
+    if (!draftFlow.triggerId) {
+      setDraft()
+      toast.error('Please Select Trigger')
+      return;
+    }
+    if (!draftFlow.name) {
+      toast.error("Please enter valid name")
+      return;
+    }
+    if(draftFlow.actions.length < 1) {
+      toast.error('Please select atleast one action')
+      return;
+    }
+    
+    try {
+      if (isNew) {
+        await addFlow(flow);
+        toast.success('Flow created successfully!');
+      } else if (flowId) {
+        await updateFlow(flowId as string, flow);
+        toast.success('Flow updated successfully!');
+      }
+      router.push('/flows'); // Redirect to the dashboard after saving
+    } catch (error) {
+      console.error('Error saving flow:', error);
+      toast.error('Failed to save flow');
     }
   };
 
@@ -72,29 +127,54 @@ const FlowEditor = () => {
     toast.success('Flow tested successfully!');
   };
 
-  const handleConfigSave = (config: Record<string, any>) => {
-    // Save configuration for the current service type
+  const handleConfigSave = (type: 'trigger'| 'action' , serviceId: string , config: Record<string, any>) => {
+
     setStepConfigs(prev => ({
       ...prev,
       [configType]: config
     }));
+
+    if (type === 'trigger') {
+      updateDraftFlowTrigger(serviceId, config)
+    } else if (type === 'action') {
+      updateDraftFlowActions(serviceId, config)
+    }
     
-    // Update flow steps with new config
-    setFlowSteps(prev => {
-      if (currentStep !== null && prev[currentStep]) {
+    if (currentStep !== null) {
+      setFlowSteps(prev => {
         const newSteps = [...prev];
-        newSteps[currentStep] = {
-          ...newSteps[currentStep],
-          config
-        };
+        if (newSteps[currentStep]) {
+          newSteps[currentStep] = {
+            ...newSteps[currentStep],
+            config
+          };
+        } else {
+          // Create a new step if it doesn't exist
+          newSteps[currentStep] = {
+            type: currentStep === 0 ? 'trigger' : 'action',
+            service: configType,
+            logoUrl: "", // You might want to set this based on the service
+            config
+          };
+        }
         return newSteps;
-      }
-      return prev;
-    });
-    
+      });
+    }
     toast.success('Configuration saved');
     setShowConfig(false);
   };
+
+  if (loading && !isNew) {
+    return <div>
+      <Loader2Icon className="h-8 w-8 text-primary animate-spin" />
+      <div className="flex items-center justify-center h-screen">Loading flow data...</div>;
+    </div>
+    
+  }
+
+  if (error && !isNew) {
+    toast.error(`Error: ${error}`)
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -141,18 +221,22 @@ const FlowEditor = () => {
       {/* Main Content - Make it scrollable */}
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 overflow-auto">
-          <FlowCanvas //@ts-ignore
-            flowId={flowId} 
-            isNew={isNew}
+          <FlowCanvas
+            flowId={flowId as string} 
+            isNew={isNew} //@ts-ignore
             onConfigOpen={handleConfigOpen}
           />
         </div>
         
         {showConfig && (
           <ConfigPanel
-            type={configType}
-            onClose={() => setShowConfig(false)}
-            onSave={handleConfigSave}
+          type={configType}
+          initialConfig={currentStep !== null && flowSteps[currentStep]?.config 
+            ? flowSteps[currentStep].config 
+            : stepConfigs[configType]}
+          onClose={() => setShowConfig(false)}
+          onSave={handleConfigSave}
+          flow={existingFlow}
           />
         )}
       </div>
