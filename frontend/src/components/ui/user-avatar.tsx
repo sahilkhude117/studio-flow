@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { LogOut, SunMoon } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export const UserAvatar = () => {
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -20,10 +23,19 @@ export const UserAvatar = () => {
             <SunMoon size={18} /> <span>Appearance</span>
           </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem className="cursor-pointer text-destructive">
+        <DropdownMenuItem onClick={logOut} className="cursor-pointer text-destructive">
           <LogOut size={18} /> <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
+
+
+const logOut = () => {
+  const { logout } = useAuth();
+  const router = useRouter()
+
+  logout();
+  router.push('/')
+}
