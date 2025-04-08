@@ -166,8 +166,7 @@ const FlowEditor = () => {
 
   if (loading && !isNew) {
     return <div>
-      <Loader2Icon className="h-8 w-8 text-primary animate-spin" />
-      <div className="flex items-center justify-center h-screen">Loading flow data...</div>;
+      <Loader2Icon className="h-8 w-8 text-primary animate-spin flex items-center justify-center h-screen" />
     </div>
     
   }
