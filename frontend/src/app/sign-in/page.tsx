@@ -94,7 +94,7 @@ export default function SignInPage() {
             {/* Google Sign In */}
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center gap-2 hover:bg-gray-100"
+              className=" cursor-pointer w-full flex items-center justify-center gap-2 hover:bg-gray-100"
               onClick={handleGoogleSignIn}
             >
               <FcGoogle className="w-5 h-5" />
