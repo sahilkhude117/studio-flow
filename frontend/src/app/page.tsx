@@ -52,6 +52,8 @@ import { MousePointer, FileText, Play, Check } from "lucide-react";
 
 
 
+
+
 const steps = [
   {
     icon: "MousePointer",
@@ -252,7 +254,7 @@ export default function LandingPage() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-full"
+              className=" cursor-pointer rounded-full"
             >
               {mounted && theme === "dark" ? (
                 <Sun className="size-[18px]" />
