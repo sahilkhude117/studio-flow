@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";  
+import { useRouter } from "next/navigation";
 import {
   ChevronRight,
   Menu,
@@ -49,6 +50,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "next-themes";
 import { MousePointer, FileText, Play, Check } from "lucide-react";
 
+
+
 const steps = [
   {
     icon: "MousePointer",
@@ -56,7 +59,7 @@ const steps = [
     description:
       "Drag and drop triggers, actions, and conditions to create your perfect workflow.",
     color: "bg-studio-600",
-    iconColor: "text-white"  
+    iconColor: "text-white",
   },
   {
     icon: "FileText",
@@ -83,7 +86,6 @@ const steps = [
 
 // Dynamically render icon components by name
 import { LucideIcon } from "lucide-react";
-
 
 // Dynamically render icon components by name
 const getIconComponent = (name: string) => {
@@ -114,6 +116,7 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
 
   const currentYear = new Date().getFullYear();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     setMounted(true);
@@ -136,13 +139,11 @@ export default function LandingPage() {
 
   const handleSignIn = () => {
     router.push("/sign-in");
-  }
+  };
 
   const handleSignUp = () => {
     router.push("/sign-up");
-  }
-
-
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -226,14 +227,12 @@ export default function LandingPage() {
               How It Works
             </Link>
 
-
             {/* <Link
               href="#testimonials"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             /> */}
-            
 
-              {/* Testimonials
+            {/* Testimonials
             </Link>
             <Link
               href="#pricing"
@@ -262,22 +261,42 @@ export default function LandingPage() {
               )}
               <span className="sr-only">Toggle theme</span>
             </Button>
-            {/* <Link
-              onClick={handleSignUp}
-              href="#"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Log in 
-            </Link> */}
-            <Button  onClick={handleSignIn} className=" cursor-pointer rounded-full">
-              Log in
-              <ChevronRight className="ml-1 size-4" />
-            </Button>
-            <Button onClick={handleSignUp} className=" cursor-pointer rounded-full">
-              Get Started
-              <ChevronRight className="ml-1 size-4" />
-            </Button>
+
+            {status === "authenticated" ? (
+              <>
+                <Link href="/profile" className="flex items-center gap-2">
+                  <Image
+                    src={session.user?.image || "/default-avatar.png"}
+                    alt="Profile"
+                    width={32}
+                    height={32}
+                    className="rounded-full object-cover"
+                  />
+                  <span className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                    {session.user?.name?.split(" ")[0] || "Profile"}
+                  </span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={handleSignIn}
+                  className="cursor-pointer rounded-full"
+                >
+                  Log in
+                  <ChevronRight className="ml-1 size-4" />
+                </Button>
+                <Button
+                  onClick={handleSignUp}
+                  className="cursor-pointer rounded-full"
+                >
+                  Get Started
+                  <ChevronRight className="ml-1 size-4" />
+                </Button>
+              </>
+            )}
           </div>
+
           <div className="flex items-center gap-4 md:hidden">
             <Button
               variant="ghost"
@@ -1320,50 +1339,63 @@ export default function LandingPage() {
           </div> 
         </div>
       </footer> */}
-       <footer className="bg-gray-900 text-white pt-12 pb-6 mt-20"> {/* Added mt-20 for spacing */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-8 mb-8">
-          <div>
-            <h3 className="text-2xl font-bold mb-3 gradient-text">StudioFlow</h3>
-            <p className="text-gray-400 mb-4 max-w-sm">
-              Simplifying workflow automation for teams of all sizes.
-            </p>
-            <div className="flex items-center space-x-3">
-              <a href="#" className="text-gray-400 hover:text-white">
-                <Facebook size={18} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <Twitter size={18} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <Instagram size={18} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <Linkedin size={18} />
-              </a>
+      <footer className="bg-gray-900 text-white pt-12 pb-6 mt-20">
+        {" "}
+        {/* Added mt-20 for spacing */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-8 mb-8">
+            <div>
+              <h3 className="text-2xl font-bold mb-3 gradient-text">
+                StudioFlow
+              </h3>
+              <p className="text-gray-400 mb-4 max-w-sm">
+                Simplifying workflow automation for teams of all sizes.
+              </p>
+              <div className="flex items-center space-x-3">
+                <a href="#" className="text-gray-400 hover:text-white">
+                  <Facebook size={18} />
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  <Twitter size={18} />
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  <Instagram size={18} />
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  <Linkedin size={18} />
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-semibold mb-3">Quick Links</h4>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Integrations
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Contact
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <div>
-            <h4 className="text-lg font-semibold mb-3">Quick Links</h4>
-            <ul className="space-y-2 text-gray-400 text-sm">
-              <li><a href="#" className="hover:text-white">Features</a></li>
-              <li><a href="#" className="hover:text-white">Integrations</a></li>
-              <li><a href="#" className="hover:text-white">Contact</a></li>
-            </ul>
+          <div className="border-t border-gray-800 pt-6 text-center">
+            <p className="text-gray-500 text-sm">
+              &copy; {currentYear} StudioFlow. All rights reserved.
+            </p>
           </div>
         </div>
-
-        <div className="border-t border-gray-800 pt-6 text-center">
-          <p className="text-gray-500 text-sm">
-            &copy; {currentYear} StudioFlow. All rights reserved.
-          </p>
-        </div>
-      </div>
-    </footer>
-
-    </div> 
-    
+      </footer>
+    </div>
   );
-  
 }
