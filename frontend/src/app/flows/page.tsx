@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import Link from 'next/link';
-import { PlusCircle, GitBranch, Mail, MessageSquare } from 'lucide-react';
+import { PlusCircle, GitBranch, Mail, MessageSquare, Loader2Icon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FlowCard } from '@/components/FlowCard';
 import { EmptyState } from '@/components/EmptyState';
@@ -26,7 +26,7 @@ import { MoreHorizontal } from 'lucide-react';
 import Image from 'next/image';
 
 const Dashboard = () => {
-  const { flows, toggleFlowStatus, deleteFlow } = useFlowContext();
+  const { flows, toggleFlowStatus, deleteFlow, loading, error } = useFlowContext();
   
   const handleToggleStatus = (id: string) => {
     toggleFlowStatus(id);
@@ -60,6 +60,14 @@ const Dashboard = () => {
     }).format(date);
   };
 
+  if (loading) {
+    <Loader2Icon className="h-8 w-8 text-primary animate-spin flex items-center justify-center h-screen" />
+  }
+
+  if (error) {
+    toast.error(`Error: ${error}`)
+  }
+
   return (
     <div className='p-6'>
       <div className="flex justify-between items-center mb-6">
@@ -71,7 +79,6 @@ const Dashboard = () => {
           </Link>
         </Button>
       </div>
-
       {flows.length === 0 ? (
         <EmptyState
           title="No flows yet"
@@ -139,10 +146,7 @@ const Dashboard = () => {
                         <DropdownMenuItem asChild>
                           <Link href={`/flow/${flow.id}`}>Edit</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDuplicate(flow.id)}>
-                          Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
+                       <DropdownMenuItem 
                           className="text-destructive"
                           onClick={() => handleDelete(flow.id)}
                         >
