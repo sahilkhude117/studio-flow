@@ -24,23 +24,21 @@ type FlowCanvasProps = {
 
 type FlowStep = {
   type: 'trigger' | 'action';
-  service: 'mailchimp' | 'sendgrid' | 'chatgpt';
-  name: string;
-  description: string;
+  service: string;
+  logoUrl: string;
 };
 
 export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasProps) => {
   const router = useRouter();
-  const { addFlow, flows, updateFlow } = useFlowContext();
+  const { addFlow, flows, updateFlow, updateDraftFlowTrigger } = useFlowContext();
   
+  const existingFlow = !isNew ? flows.find(flow => flow.id === flowId) : null;
+
   const [flowSteps, setFlowSteps] = useState<FlowStep[]>(isNew ? [] : (
-    flows.find(f => f.id === flowId)?.steps.map(step => ({
+    existingFlow?.steps.map(step => ({
       type: step.type,
       service: step.service,
-      name: step.type === 'trigger' ? 'New Subscriber' : 
-             step.service === 'chatgpt' ? 'Process with AI' : 'Send Email',
-      description: step.type === 'trigger' ? 'Triggered when a new contact is added to an audience' :
-                  step.service === 'chatgpt' ? 'Process data with ChatGPT' : 'Sends an email using a template'
+      logoUrl: step.logoUrl,
     })) || []
   ));
   
@@ -52,8 +50,7 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
     setFlowSteps([{
       type: 'trigger',
       service,
-      name: 'New Subscriber',
-      description: 'Triggered when a new contact is added to an audience'
+      logoUrl: ''
     }]);
     setShowTriggerModal(false);
     if (onConfigOpen) onConfigOpen('mailchimp');
@@ -65,10 +62,7 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
     const newAction = {
       type: 'action' as const,
       service,
-      name: service === 'chatgpt' ? 'Process with AI' : 'Send Email',
-      description: service === 'chatgpt' 
-        ? 'Process data with ChatGPT' 
-        : 'Sends an email using a template'
+      logoUrl: ''
     };
     
     if (index === flowSteps.length) {
@@ -147,6 +141,7 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
                     : 'bg-blue-50 border border-blue-200'
                 } rounded-lg flex flex-col items-center cursor-pointer`}
                 onClick={() => {
+                  //@ts-ignore
                   if (onConfigOpen) onConfigOpen(step.service);
                 }}
               >
@@ -172,7 +167,7 @@ export const FlowCanvas = ({ flowId, isNew = false, onConfigOpen }: FlowCanvasPr
                   )}
                 </div>
                 <span className="font-medium text-sm">{step.service === 'chatgpt' ? 'ChatGPT' : 'SendGrid'}</span>
-                <span className="text-xs text-muted-foreground">{step.name}</span>
+                <span className="text-xs text-muted-foreground">{step.logoUrl}</span>
               </div>
               
               {/* Add "+" button after the step if it's the last one */}
