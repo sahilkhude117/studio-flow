@@ -269,11 +269,11 @@ export default function LandingPage() {
             >
               Log in 
             </Link> */}
-            <Button  onClick={handleSignUp} className=" cursor-pointer rounded-full">
+            <Button  onClick={handleSignIn} className=" cursor-pointer rounded-full">
               Log in
               <ChevronRight className="ml-1 size-4" />
             </Button>
-            <Button onClick={handleSignIn} className=" cursor-pointer rounded-full">
+            <Button onClick={handleSignUp} className=" cursor-pointer rounded-full">
               Get Started
               <ChevronRight className="ml-1 size-4" />
             </Button>
