@@ -84,6 +84,13 @@ class FlowsView(APIView):
             metadata=trigger_metadata
         )
 
+        steps = [{
+            "type": "trigger",
+            "service": available_trigger.name,
+            "logoUrl": available_trigger.image,
+            "config": trigger_metadata
+        }]
+
         actions_data = data.get('actions', [])
         for index, action_data in enumerate(actions_data):
             try:
@@ -94,6 +101,12 @@ class FlowsView(APIView):
                     metadata=action_data.get('config', {}),
                     sortingOrder=index
                 )
+                steps.append({
+                    "type": "action",
+                    "service": available_action.name,
+                    "logoUrl": available_action.image,
+                    "config": action_data.get('config', {})
+                })
             except AvailableAction.DoesNotExist:
                 # Skip invalid actions
                 continue
@@ -103,14 +116,7 @@ class FlowsView(APIView):
             "name": flow.name,
             "createdAt": flow.createdAt.isoformat(),
             "active": flow.active,
-            "steps": [
-                {
-                    "type": "trigger",
-                    "service": available_trigger.name,
-                    "logoUrl": available_trigger.image,
-                    "config": trigger_metadata
-                }
-            ]
+            "steps": steps
         }, status=status.HTTP_201_CREATED)
 
 
