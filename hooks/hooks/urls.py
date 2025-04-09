@@ -4,5 +4,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/hooks/', include('webhook.urls')),
+    path('api/v1/hooks/', include('webhook.urls')),
 ]
