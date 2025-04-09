@@ -32,10 +32,12 @@ interface AuthProviderProps {
 const isTokenExpired = (token: string): boolean => {
   try {
     const decodedToken = JSON.parse(atob(token.split('.')[1]));
-    const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
-    return Date.now() >= expirationTime;
+    const expirationTime = decodedToken.exp * 1000;
+    // Add a small buffer (e.g., 5 seconds) to account for any timing issues
+    return Date.now() >= (expirationTime - 5000);
   } catch (error) {
-    return true; // If the token is invalid, treat it as expired
+    console.error('Error checking token expiration:', error);
+    return true;
   }
 };
 
