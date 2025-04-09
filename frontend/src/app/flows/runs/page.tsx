@@ -1,5 +1,5 @@
-
-import React from 'react';
+'use client'
+import React, { useContext, useEffect, useState } from 'react';
 import {
   CheckCircle,
   Clock,
@@ -29,6 +29,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { AuthContext, useAuth } from '@/contexts/AuthContext';
+import { BACKEND_URL } from '@/lib/config';
+import { useRouter } from 'next/navigation';
 
 type Run = {
   id: string;
@@ -67,41 +70,90 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 const Runs = () => {
-  const runs: Run[] = [
-    {
-      id: '1',
-      flowName: 'New Subscriber Welcome',
-      status: 'success',
-      timestamp: '2023-05-15 14:32:45',
-      duration: '1.2s',
-    },
-    {
-      id: '2',
-      flowName: 'Customer Onboarding',
-      status: 'failed',
-      timestamp: '2023-05-15 13:18:22',
-      duration: '3.5s',
-    },
-    {
-      id: '3',
-      flowName: 'New Subscriber Welcome',
-      status: 'running',
-      timestamp: '2023-05-15 15:01:05',
-      duration: '...',
-    },
-  ];
+  const [runs, setRuns] = useState<Run[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [timeFilter, setTimeFilter] = useState('24h');
+  const router = useRouter()
+  const currentToken = localStorage.getItem('token')
+
+  if (!currentToken) {
+    router.push('/sign-in')
+    return;
+  }
+
+  
+  useEffect(() => {
+    fetchFlowRuns();
+  }, [statusFilter, timeFilter]);
+
+  const fetchFlowRuns = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/api/flow-runs/?status=${statusFilter}&time=${timeFilter}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${currentToken}`
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error('Failed to fetch flow runs');
+      }
+
+      const data = await response.json();
+      setRuns(data);
+      setError(null);
+    } catch(err) {
+      setError('Error fetching flow runs. Please try again.');
+      console.error('Error fetching flow runs:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleViewDetails = (runId: string) => {
+    router.push(`/flows/runs/${runId}`)
+  };
+
+    const timeFilterLabels = {
+      '24h': 'Last 24 hours',
+      '7d': 'Last 7 days',
+      '30d': 'Last 30 days',
+    };
+
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Flow Runs</h1>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            <span>Last 24 hours</span>
-            <ChevronDown className="h-4 w-4 ml-1" />
-          </Button>
-          <Select defaultValue="all">
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={() => {
+                // You could implement a dropdown here
+                // For now we'll just cycle through options
+                const options = ['24h', '7d', '30d'];
+                const currentIndex = options.indexOf(timeFilter);
+                const nextIndex = (currentIndex + 1) % options.length;
+                setTimeFilter(options[nextIndex]);
+              }}
+            >
+              <Calendar className="h-4 w-4" />
+              <span>{timeFilterLabels[timeFilter as keyof typeof timeFilterLabels]}</span>
+              <ChevronDown className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+          <Select 
+            value={statusFilter} 
+            onValueChange={setStatusFilter}
+          >
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -120,34 +172,53 @@ const Runs = () => {
           <CardTitle>Recent Flow Executions</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Flow</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Timestamp</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {runs.map((run) => (
-                <TableRow key={run.id}>
-                  <TableCell className="font-medium">{run.flowName}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={run.status} />
-                  </TableCell>
-                  <TableCell>{run.timestamp}</TableCell>
-                  <TableCell>{run.duration}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      View Details
-                    </Button>
-                  </TableCell>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <p>Loading flow runs...</p>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 p-4 text-center">{error}</div>
+          ) : runs.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No flow runs found for the selected filters.
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Flow</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Timestamp</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {runs.map((run) => (
+                  <TableRow key={run.id}>
+                    <TableCell className="font-medium">{run.flowName}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={run.status} />
+                    </TableCell>
+                    <TableCell>{run.timestamp}</TableCell>
+                    <TableCell>{run.duration}</TableCell>
+                    <TableCell className="text-right">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewDetails(run.id);
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
