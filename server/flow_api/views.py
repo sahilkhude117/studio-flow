@@ -6,7 +6,7 @@ from django.db import transaction
 from database.models import Flow, Trigger, Action, AvailableAction, AvailableTrigger
 from .serializers import FlowCreateSerializer, FlowListSerializer , FlowDetailSerializer
 from django.shortcuts import get_object_or_404
-
+import requests
 
 # Req : GET
 # Endpoint : /api/v1/flow/
@@ -241,10 +241,57 @@ class ToggleFlowStatusView(APIView):
             flow = Flow.objects.get(pk=pk, userId=request.user)
             flow.active = not flow.active
             flow.save()
+            
+            # Trigger webhook after flow is saved
+            self.trigger_webhook(flow)
+            
             return Response({"message": "Flow status updated", 'active': flow.active})
         except Flow.DoesNotExist:
             return Response({"error": "Flow not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        except Exception as e:
+            # Log the error but don't expose it to the client
+            print(f"Error in ToggleFlowStatusView: {str(e)}")
+            return Response({"message": "Flow status updated but webhook failed", 'active': flow.active})
+    
+    def trigger_webhook(self, flow):
+        """Trigger webhook with flow information"""
+        try:
+            # Construct webhook URL using flow ID
+            webhook_url = f"http://127.0.0.1:8001/api/v1/hooks/catch/2/{flow.id}"
+            
+            # Prepare payload with relevant flow information
+            payload = {
+                "flow_id": str(flow.id),
+                "name": flow.name,
+                "active": flow.active,
+                "trigger_id": flow.triggerId
+            }
+            
+            # Make async request to webhook (non-blocking)
+            # For a production app, consider using celery or django-background-tasks
+            # This is a simple implementation that won't block the response
+            from threading import Thread
+            Thread(target=self._send_webhook_request, args=(webhook_url, payload)).start()
+            
+        except Exception as e:
+            # Log the error but don't raise it - we don't want webhook failures 
+            # to prevent successful flow status updates
+            print(f"Webhook trigger error: {str(e)}")
+    
+    def _send_webhook_request(self, url, payload):
+        """Helper method to send the actual webhook request"""
+        try:
+            response = requests.post(
+                url, 
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=5  # Set a reasonable timeout
+            )
+            print(f"Webhook response: {response.status_code}")
+            if response.status_code >= 400:
+                print(f"Webhook error response: {response.text}")
+        except Exception as e:
+            print(f"Error sending webhook: {str(e)}")
 
 class DeleteFlowView(APIView):
     permission_classes = [IsAuthenticated]
