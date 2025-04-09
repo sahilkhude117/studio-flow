@@ -94,12 +94,38 @@ class FlowRun(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     flowId = models.ForeignKey(Flow, on_delete=models.CASCADE, related_name='flowRuns')
     metadata = models.JSONField(default=dict)
+    status = models.CharField(max_length=20, default='pending', 
+                             choices=[('pending', 'Pending'), 
+                                      ('processing', 'Processing'), 
+                                      ('completed', 'Completed'), 
+                                      ('failed', 'Failed')])
+    created_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
     
     class Meta:
         db_table = 'FlowRun'
 
     def __str__(self):
         return f"FlowRun {self.id}"
+
+class ActionExecution(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    flowRunId = models.ForeignKey(FlowRun, on_delete=models.CASCADE, related_name='actionExecutions')
+    actionId = models.ForeignKey(Action, on_delete=models.CASCADE, related_name='executions')
+    status = models.CharField(max_length=20, 
+                             choices=[('pending', 'Pending'), 
+                                      ('completed', 'Completed'), 
+                                      ('failed', 'Failed')])
+    result = models.JSONField(default=dict)
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'ActionExecution'
+    
+    def __str__(self):
+        return f"Execution of {self.actionId} for {self.flowRunId}"
+
 
 class FlowRunOutbox(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
