@@ -11,6 +11,8 @@ import axios from "axios"
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { BACKEND_URL } from '@/lib/config'
+import { signIn } from 'next-auth/react'
+import { FcGoogle } from 'react-icons/fc'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -59,6 +61,10 @@ export default function SignupPage() {
     }
   }
 
+  const handleGoogleSignUp = () => {
+    signIn('google', { callbackUrl: '/profile' });
+  };
+
   return (
     <div className="min-h-screen pb-24">
       <div className="max-w-md mx-auto px-4 py-12">
@@ -67,13 +73,30 @@ export default function SignupPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           {/* Header */}
-          <div className="mb-12 text-center">
-            <h1 className="text-3xl font-bold mb-4">
+          <div className="mb-5 text-center">
+            <h1 className="text-3xl font-bold ">
               Join StudioFlow
             </h1>
-            <p className="text-[#6B7280]">
+            <p className=" mb-2 text-[#6B7280]">
               Automate your workflows
             </p>
+          </div>
+
+          {/* Google Sign Up on Top */}
+          <Button
+            variant="outline"
+            className=" cursor-pointer  mt-5 w-full mb-2 flex items-center justify-center gap-2 hover:bg-gray-100"
+            onClick={handleGoogleSignUp}
+          >
+            <FcGoogle size={20} />
+            Sign up with Google
+          </Button>
+
+          {/* Divider */}
+          <div className="flex items-center my-6">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-sm text-gray-500">or continue with email</span>
+            <div className="flex-grow border-t border-gray-300"></div>
           </div>
 
           {/* Form Card */}
@@ -146,17 +169,18 @@ export default function SignupPage() {
                 </div>
                 </div>
               </div>
+
               {/* Error Message */}
               {error && (
-                  <div className="text-red-500 text-sm text-center">
-                      {error}
-                  </div>
+                <div className="text-red-500 text-sm text-center">
+                    {error}
+                </div>
               )}
 
               <Button
                 type='submit'
                 disabled={loading}
-                className="w-full cursor-pointer bg-black py-5 font-bold"
+                className=" cursor-pointer w-full cursor-pointer bg-black py-5 font-bold"
                 size="lg"
                 onClick={handleSubmit}
               >
@@ -166,10 +190,10 @@ export default function SignupPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Creating Acount...
+                    Creating Account...
                   </span>
                 ) : (
-                  <div className='flex justify-center'>
+                  <div className=' cursor-pointer flex justify-center'>
                     Create Account
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </div>
@@ -178,7 +202,7 @@ export default function SignupPage() {
             </form>
           </Card>
 
-          <p className="mt-8 text-center text-[#6B7280]">
+          <p className="mt-1 text-center text-[#6B7280]">
             Already have an account?{' '}
             <Link
               href="/sign-in"

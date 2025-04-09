@@ -5,15 +5,17 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Apple, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { FcGoogle } from 'react-icons/fc';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ForgotPassword from '@/components/ForgotPassword';
 import axios from 'axios';
 import { BACKEND_URL } from '@/lib/config';
 import { useAuth } from '@/contexts/AuthContext';
+import { signIn } from 'next-auth/react';
 
-export default function LoginPage() {
+export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [hidePass, setHidePass] = useState(true);
@@ -28,7 +30,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true);
     setError('');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,103 +49,107 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    
+
     try {
-        
       const res = await axios.post(`${BACKEND_URL}/api/v1/user/signin/`, {
         email,
         password,
-      })
+      });
       const token = res.data.access;
-      const userData = res.data.user || { 
+      const userData = res.data.user || {
         id: res.data.id || '',
         email: email,
-        username: res.data.username || email.split('@')[0], // Fallback if username not provided
+        username: res.data.username || email.split('@')[0],
       };
 
       login(userData, token);
-
-      router.push('/flows')
+      router.push('/flows');
     } catch (e) {
       setError('Something went wrong. Please try again.');
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn('google', { callbackUrl: '/profile' });
   };
 
   return (
     <div className="min-h-screen pb-24">
-      <div className="max-w-md mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {/* Header */}
-          <div className="mb-12 text-center">
-            <h1 className="text-3xl font-bold mb-4">
-              Welcome Back to StudioFlow
-            </h1>
-            <p>
-              Continue your automation with us
-            </p>
+      <div className="max-w-md mx-auto px-4 mt-8 ">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="mb-4 text-center">
+            <h1 className="text-3xl font-bold mb-4">Welcome Back to StudioFlow</h1>
+            <p>Continue your automation with us</p>
           </div>
 
-          {/* Form Card */}
-          <Card className="p-6 shadow-sm">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-4">
-                {/* Email Field */}
-                <div>
-                  <label className="text-sm font-medium">
-                    Email Address
-                  </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    className="mt-1"
-                    autoComplete="email"
-                    placeholder="your@email.com"
-                    required
-                    value={email}
-                    onChange={(e) => {
-                      setError('');
-                      setEmail(e.target.value)
-                    }}
-                  />
-                </div>
+          {/* Card starts here */}
+          <Card className="p-4 shadow-sm space-y-0">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold">Login to your account</h2>
+              <p className="text-sm text-muted-foreground">Access your StudioFlow dashboard</p>
+            </div>
 
-                {/* Password Field */}
-                <div className="relative">
-                  <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium">
-                      Password
-                    </label>
-                    <ForgotPassword/>
-                  </div>
-                  <div>
-                  <Input
-                    id="password"
-                    name="password"
-                    type={hidePass ? 'password' : 'text'}
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    className="mt-1 pr-10"
-                    placeholder="••••••••••••••••"
-                    onChange={(e) => {
-                      setError('')
-                      setPassword(e.target.value)
-                    }}
-                  />
-                  </div>
-                  <div
-                    onClick={toggleVisibility}
-                    className="absolute inset-y-0 right-0 top-5 flex items-center pr-3 cursor-pointer"
-                  >
-                    {hidePass ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </div>
-                  </div>
+            {/* Google Sign In */}
+            <Button
+              variant="outline"
+              className=" cursor-pointer w-full flex items-center justify-center gap-2 hover:bg-gray-100"
+              onClick={handleGoogleSignIn}
+            >
+              <FcGoogle className="w-5 h-5" />
+              Sign in with Google
+            </Button>
+
+            {/* Divider */}
+            <div className="text-center my-2 text-sm text-muted-foreground">or</div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email Field */}
+              <div>
+                <label className="text-sm font-medium">Email Address</label>
+                <Input
+                  id="email"
+                  type="email"
+                  className="mt-1"
+                  autoComplete="email"
+                  placeholder="your@email.com"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setError('');
+                    setEmail(e.target.value);
+                  }}
+                />
+              </div>
+
+              {/* Password Field */}
+              <div className="relative">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-sm font-medium">Password</label>
+                  <ForgotPassword />
                 </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type={hidePass ? 'password' : 'text'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  className="pr-10"
+                  placeholder="••••••••••••••••"
+                  onChange={(e) => {
+                    setError('');
+                    setPassword(e.target.value);
+                  }}
+                />
+                <div
+                  onClick={toggleVisibility}
+                  className="absolute inset-y-10 right-0 top-1/2 transform -translate-y-1/2 pr-3 cursor-pointer"
+                >
+                  {hidePass ? <EyeOff size={20} /> : <Eye size={20} />}
+                </div>
+              </div>
 
               {/* Error Message */}
               {error && (
@@ -182,9 +188,9 @@ export default function LoginPage() {
                     Logging in...
                   </span>
                 ) : (
-                  <div className="flex justify-center">
-                    Create Account
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <div className="cursor-pointer flex justify-center">
+                    Sign In
+                    <ArrowRight className="ml-2 h-0 w-4" />
                   </div>
                 )}
               </Button>
@@ -192,12 +198,9 @@ export default function LoginPage() {
           </Card>
 
           {/* Footer */}
-          <p className="mt-8 text-center">
+          <p className="mt-2 text-center">
             Don't have an account?{' '}
-            <Link
-              href="/sign-up"
-              className="font-bold hover:underline"
-            >
+            <Link href="/sign-up" className="font-bold hover:underline">
               Create account
             </Link>
           </p>
