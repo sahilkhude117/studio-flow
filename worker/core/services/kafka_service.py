@@ -6,6 +6,7 @@ from django.db import transaction
 from database.models import FlowRun, Action, Flow
 import requests
 from sendgrid import SendGridAPIClient
+from django.utils import timezone
 from sendgrid.helpers.mail import Mail, Email, To, Content
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ class KafkaService:
                     success = self.process_flow_run(flow_run_id)
                     if success:
                         print(f"Successfully processed flow run: {flow_run_id}")
+                        logger.info(f"Successfully processed flow run: {flow_run_id}")
                     else:
                         logger.error(f"Failed to process flow run: {flow_run_id}")
                 else:
@@ -127,6 +129,8 @@ class KafkaService:
                 logger.info("Updating flow run with execution results")
                 flow_run.metadata['execution_results'] = execution_results
                 flow_run.metadata['status'] = 'completed'
+                flow_run.status='completed'
+                flow_run.completed_at = timezone.now()
                 flow_run.save()
                 logger.info(f"Flow run {flow_run_id} successfully processed")
                 
@@ -182,7 +186,7 @@ class ChatGPTHandler:
             model = action_metadata.get('model', 'gpt-3.5-turbo')
             temperature = float(action_metadata.get('temperature', 0.7))
             output_variable = action_metadata.get('outputVariable', 'processed_content')
-       
+        
 
             processed_prompt = self._process_template(prompt, previous_results)
 
