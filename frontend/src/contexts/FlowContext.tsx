@@ -133,10 +133,14 @@ export const FlowProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const fetchFlows = async (): Promise<Flow[]> => {
-    if (!isAuthenticated || !token) {
+    if (!isAuthenticated) {
       return [];
     }
     
+    if (!token) {
+      return[]
+    }
+
     setLoading(true);
     setError(null);
     try {

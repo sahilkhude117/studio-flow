@@ -29,6 +29,16 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const isTokenExpired = (token: string): boolean => {
+  try {
+    const decodedToken = JSON.parse(atob(token.split('.')[1]));
+    const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
+    return Date.now() >= expirationTime;
+  } catch (error) {
+    return true; // If the token is invalid, treat it as expired
+  }
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -39,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
     
-    if (storedToken && storedUser) {
+    if (storedToken && storedUser && !isTokenExpired(storedToken)) {
       try {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
@@ -74,6 +84,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   };
+
+  useEffect(() => {
+    if (token && isTokenExpired(token)) {
+      logout(); // Automatically log out if token is expired
+    }
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ user, token, isAuthenticated, login, logout }}>
