@@ -2,7 +2,9 @@
 /server/__pycache__
 /user_api/__pycache__
 /flow_api/__pycache__
+/flowrun_api/__pycache__
 /flow_api/migrations/__pycache__
+/flowrun_api/migrations/__pycache__
 /trigger_api/migrations/__pycache__
 /trigger_api/__pycache__
 /action_api/migrations/__pycache__

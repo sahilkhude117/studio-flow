@@ -8,4 +8,5 @@ urlpatterns = [
     path('api/v1/flow/', include('flow_api.urls')),
     path('api/v1/trigger/', include('trigger_api.urls')),
     path('api/v1/action/', include('action_api.urls')),
+    path('api/flow-runs/', include('flowrun_api.urls'))
 ]
