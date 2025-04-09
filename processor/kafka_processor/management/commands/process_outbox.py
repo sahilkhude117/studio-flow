@@ -42,10 +42,7 @@ class Command(BaseCommand):
 
                 # send to kafka
                 if kafka_service.send_messages(pending_records):
-                    ids_to_delete = [record.id for record in pending_records]
-
-                    deletion_count, _ = FlowRunOutbox.objects.filter(id__in=ids_to_delete).delete()
-                    self.stdout.write(self.style.SUCCESS(f"Deleted {deletion_count} processed records"))
+                    self.stdout.write(self.style.SUCCESS(f"Sent to kafka"))
                 else:
                     self.stdout.write(self.style.ERROR("Failed to send messages to Kafka. Will retry."))
             else:
