@@ -1,7 +1,7 @@
 'use client'
-import React from 'react';
+import React, { useContext } from 'react';
 import Link from 'next/link';
-import { PlusCircle, GitBranch, Mail, MessageSquare, Loader2Icon } from 'lucide-react';
+import { PlusCircle, GitBranch, Mail, MessageSquare, Loader2Icon, Divide } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FlowCard } from '@/components/FlowCard';
 import { EmptyState } from '@/components/EmptyState';
@@ -24,15 +24,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
 import Image from 'next/image';
+import { AuthContext } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
   const { flows, toggleFlowStatus, deleteFlow, loading, error } = useFlowContext();
   
+  const router = useRouter()
   const handleToggleStatus = (id: string) => {
     toggleFlowStatus(id);
     toast.success('Flow status updated successfully');
   };
   
+  const { token, isAuthenticated } = useContext(AuthContext);
+
   const handleDelete = (id: string) => {
     deleteFlow(id);
     toast.success('Flow deleted successfully');
@@ -60,13 +65,13 @@ const Dashboard = () => {
     }).format(date);
   };
 
-  if (loading) {
-    <Loader2Icon className="h-8 w-8 text-primary animate-spin flex items-center justify-center h-screen" />
-  }
-
   if (error) {
     toast.error(`Error: ${error}`)
   }
+
+  {!isAuthenticated ? (
+    router.push('/sign-in')
+  ): <></>}
 
   return (
     <div className='p-6'>
@@ -79,7 +84,11 @@ const Dashboard = () => {
           </Link>
         </Button>
       </div>
-      {flows.length === 0 ? (
+      {loading ? <div>
+          <div>Loading you flows...</div>
+      </div> : (
+        <>
+            {flows.length === 0 ? (
         <EmptyState
           title="No flows yet"
           description="Create your first flow to automate the connection between Mailchimp and SendGrid."
@@ -99,6 +108,10 @@ const Dashboard = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
+            {loading ? <div>
+              <div>Loading you flows...</div>
+            </div> :
+            <>
               {flows.map((flow) => (
                 <TableRow key={flow.id}>
                   <TableCell className="font-medium">
@@ -157,10 +170,15 @@ const Dashboard = () => {
                   </TableCell>
                 </TableRow>
               ))}
+            </>
+            }  
             </TableBody>
           </Table>
         </div>
       )}
+        </>
+      )}
+      
     </div>
   );
 };
