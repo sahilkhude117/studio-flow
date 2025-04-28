@@ -76,24 +76,23 @@ export const Sidebar = () => {
             label="Runs"
             to="/flows/runs"
             active={currentPath === '/flows/runs'}
-            badge={3}
           />
-          <SidebarItem
+          {/* <SidebarItem
             icon={Database}
             label="Connections"
             to="/flows/connections"
             active={currentPath === '/flows/connections'}
-          />
+          /> */}
         </SidebarSection>
 
-        <SidebarSection title="Project">
+        {/* <SidebarSection title="Project">
           <SidebarItem
             icon={Settings}
             label="Settings"
             to="/flows/settings"
             active={currentPath === '/flows/settings'}
           />
-        </SidebarSection>
+        </SidebarSection> */}
       </div>
 
       <div className="p-4 border-t">

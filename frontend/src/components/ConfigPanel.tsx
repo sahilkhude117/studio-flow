@@ -29,7 +29,7 @@ export const serviceIds = {
 }
 
 type ConfigPanelProps = {
-  type: 'mailchimp' | 'sendgrid' | 'chatgpt';
+  type: string;
   initialConfig?: Record<string, any>;
   flow:Flow | null | undefined;
   onClose: () => void;
@@ -49,6 +49,15 @@ export const ConfigPanel = ({ type, onClose, onSave, initialConfig = {}, flow}: 
     audienceId: initialConfig.audienceId || '',
     tags: '',
   });
+
+  const [airtableConfig, setAirtableConfig] = useState({
+    auth: {
+      personalAccessToken: initialConfig.auth?.personalAccessToken || '',
+    },
+    base: initialConfig.base || '',
+    tableId: initialConfig.tableId || '',
+    fields: initialConfig.fields || {},
+  })
 
   // SendGrid config
   const [sendgridConfig, setSendgridConfig] = useState({

@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export const UserAvatar = () => {
+
+  const router = useRouter();
   
   return (
     <DropdownMenu>
@@ -23,7 +25,7 @@ export const UserAvatar = () => {
             <SunMoon size={18} /> <span>Appearance</span>
           </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem onClick={logOut} className="cursor-pointer text-destructive">
+        <DropdownMenuItem onClick={() => router.push('/') } className="cursor-pointer text-destructive">
           <LogOut size={18} /> <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -31,11 +33,3 @@ export const UserAvatar = () => {
   );
 };
 
-
-const logOut = () => {
-  const { logout } = useAuth();
-  const router = useRouter()
-
-  logout();
-  router.push('/')
-}
