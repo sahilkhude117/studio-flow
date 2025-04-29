@@ -6,8 +6,40 @@ import axios from 'axios';
 import { BACKEND_URL } from '@/lib/config';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { serviceIds } from '@/components/ConfigPanel';
 
+// utils/serviceMapping.ts
+import { serviceIds } from '@/components/Test/ConfigPanel';
+
+// Map service name to UUID
+export const getServiceIdByName = (serviceName: string): string => {
+  if (!serviceName) return '';
+  
+  // Check if this is already a UUID format - simple validation
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(serviceName)) {
+    return serviceName; // It's already a UUID
+  }
+  
+  // Convert to serviceId
+  const serviceKey = Object.keys(serviceIds).find(
+    key => key.toLowerCase() === serviceName.toLowerCase()
+  );
+  
+  return serviceKey ? serviceIds[serviceKey as keyof typeof serviceIds] : serviceName;
+};
+
+// Get service name from UUID
+export const getServiceNameById = (serviceId: string): string => {
+  if (!serviceId) return '';
+  
+  // Return existing name if not UUID
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(serviceId)) {
+    return serviceId;
+  }
+  
+  // Find service name
+  const entry = Object.entries(serviceIds).find(([_, id]) => id === serviceId);
+  return entry ? entry[0] : serviceId;
+};
 
 export type Flow = {
   id: string;
@@ -48,6 +80,7 @@ type FlowContextType = {
   loading: boolean;
   error: string | null;
   draftFlow: DraftFLow;
+  setDraftFlow: React.Dispatch<React.SetStateAction<DraftFLow>>;
   updateDraftFlowName: (name: string) => void;
   updateDraftFlowActions: ( actionId: string, actionConfig: Record<string, any>) => void;
   updateDraftFlowActive: (active: boolean) => void;
@@ -84,47 +117,50 @@ export const FlowProvider = ({ children }: { children: ReactNode }) => {
     setDraftFlow((prevDraft) => ({ ...prevDraft, name}))
   }
 
-  const updateDraftFlowActive = (isActive: boolean) => {
-    setDraftFlow((prevDraft) => ({ ...prevDraft, isActive}))
+  const updateDraftFlowActive = (active: boolean) => {
+    setDraftFlow((prevDraft) => ({ ...prevDraft, active}))
   } 
  
-  const updateDraftFlowActions = (actionId: string, actionConfig: Record<string, any>) => {
-    if (actionId === 'chatgpt') {
-      actionId = serviceIds.chatgpt
-    } else if (actionId === 'sendgrid') {
-      actionId = serviceIds.sendgrid
-    }
+  const updateDraftFlowActions = (actionId: string, actionConfig: Record<string, any>,) => {
+    const mappedActionId = getServiceIdByName(actionId);
+
     setDraftFlow((prevDraft) => {
-      const actionExists = prevDraft.actions.some(action => action.actionId === actionId);
-  
-      if (actionExists) {
-        // Update the existing action
+      const existingIndex = prevDraft.actions.findIndex(
+        action => 
+          action.actionId === actionId || 
+          action.actionId === mappedActionId ||
+          getServiceIdByName(action.actionId) === mappedActionId
+      );
+
+      if (existingIndex >= 0) {
+        // Update existing action
+        const updatedActions = [...prevDraft.actions];
+        updatedActions[existingIndex] = { 
+          actionId: mappedActionId, 
+          config: actionConfig 
+        };
+        
         return {
           ...prevDraft,
-          actions: prevDraft.actions.map((action) =>
-            action.actionId === actionId
-              ? { ...action, config: actionConfig }
-              : action
-          ),
+          actions: updatedActions
         };
       } else {
-        // Add a new action
+        // Add new action with UUID
         return {
           ...prevDraft,
           actions: [
             ...prevDraft.actions,
-            { actionId, config: actionConfig },
-          ],
+            { actionId: mappedActionId, config: actionConfig }
+          ]
         };
       }
     });
   };
-    
-
+  
+  
   const updateDraftFlowTrigger = (triggerId: string, triggerConfig: Record<string, any>) => {
-    if (triggerId === 'mailchimp') {
-      triggerId = serviceIds.mailchimp
-    }
+    const mappedTriggerId = getServiceIdByName(triggerId);
+
     setDraftFlow((prevDraft) => ({
       ...prevDraft,
       triggerId,
@@ -280,6 +316,7 @@ export const FlowProvider = ({ children }: { children: ReactNode }) => {
     selectFlow,
     toggleFlowStatus,
     draftFlow,
+    setDraftFlow,
     updateDraftFlowName,
     updateDraftFlowActions,
     updateDraftFlowActive,
